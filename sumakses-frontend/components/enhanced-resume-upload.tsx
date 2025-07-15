@@ -172,19 +172,7 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
     const poll = async () => {
       try {
         attempts++
-        const apiUrl = process.env.NEXT_PUBLIC_RESUME_API_URL
-        const response = await fetch(`${apiUrl}/status/${resumeId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        
-        if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`API Error: ${response.status} - ${errorText}`)
-        }
-        
+        const response = await fetch(`/api/resume-status/${resumeId}`)
         const data = await response.json()
 
         // Update progress based on status

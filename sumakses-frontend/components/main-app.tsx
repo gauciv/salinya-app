@@ -621,8 +621,8 @@ function HomeTab({
               </div>
             </button>
           )}
-
-
+        </div>
+      </div>
 
       {/* Daily Task */}
       {userProgress.achievements.length > 0 && (
