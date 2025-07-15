@@ -44,7 +44,7 @@ export default function SkillsAssessment({ onComplete, type }: SkillsAssessmentP
   const [assessmentData, setAssessmentData] = useState<any>(null)
   const [showResults, setShowResults] = useState(false)
 
-  // Assessment steps following SUMAKSES context
+  // Assessment steps following SALINYA context
   const assessmentSteps = [
     { name: "Analyzing your skills...", icon: "🔍", duration: 2000 },
     { name: "Checking market demand...", icon: "📈", duration: 1500 },
@@ -52,7 +52,7 @@ export default function SkillsAssessment({ onComplete, type }: SkillsAssessmentP
     { name: "Finding your perfect match...", icon: "✨", duration: 1500 },
   ]
 
-  // Skills categories from SUMAKSES context
+  // Skills categories from SALINYA context
   const skillsCategories = [
     "communication",
     "problem_solving", 
@@ -63,7 +63,7 @@ export default function SkillsAssessment({ onComplete, type }: SkillsAssessmentP
     "training_mentoring"
   ]
 
-  // Career matches from SUMAKSES context
+  // Career matches from SALINYA context
   const careerMatches: CareerMatch[] = [
     {
       title: "Quality Assurance Tester",
