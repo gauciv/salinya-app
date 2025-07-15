@@ -28,7 +28,7 @@ import {
 } from "lucide-react"
 
 // Import new components
-import SkillsAssessment from "./skills-assessment"
+
 import LearningModule from "./learning-module"
 import CommunityHub from "./community-hub"
 import { Input } from "@/components/ui/input"
@@ -191,20 +191,12 @@ export default function MainApp({ userData }: MainAppProps) {
     }
   ])
 
-  const [showAssessment, setShowAssessment] = useState(false)
+
   const [showLearningModule, setShowLearningModule] = useState(false)
   const [currentModuleId, setCurrentModuleId] = useState("")
   const [showChatModal, setShowChatModal] = useState(false);
 
   // Handle component navigation
-  const handleAssessmentComplete = (assessmentData: any) => {
-    setShowAssessment(false)
-    // Update user progress based on assessment
-    setUserProgress(prev => ({
-      ...prev,
-      overallProgress: Math.min(prev.overallProgress + 10, 100)
-    }))
-  }
 
   const handleModuleComplete = (moduleData: any) => {
     setShowLearningModule(false)
@@ -230,28 +222,6 @@ export default function MainApp({ userData }: MainAppProps) {
   }
 
   // Render different views based on currentView state
-  if (showAssessment) {
-  return (
-      <div className="min-h-screen bg-background-app p-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              onClick={() => setShowAssessment(false)}
-              className="text-text-secondary hover:text-text-primary"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </div>
-          <SkillsAssessment
-            onComplete={handleAssessmentComplete}
-            type="resume_upload"
-          />
-        </div>
-      </div>
-    )
-  }
 
   if (showLearningModule) {
     return (
@@ -361,7 +331,6 @@ export default function MainApp({ userData }: MainAppProps) {
               learningPaths={learningPaths}
               notifications={notifications}
               userData={userData}
-              onStartAssessment={() => setShowAssessment(true)}
               onStartModule={(moduleId) => {
                 setCurrentModuleId(moduleId)
                 setShowLearningModule(true)
@@ -415,7 +384,6 @@ function HomeTab({
   learningPaths, 
   notifications, 
   userData,
-  onStartAssessment, 
   onStartModule,
   onShowChatModal,
   onNavigateCommunity
@@ -429,7 +397,6 @@ function HomeTab({
     title: string;
     location: string;
   }
-  onStartAssessment: () => void
   onStartModule: (moduleId: string) => void
   onShowChatModal: () => void
   onNavigateCommunity: () => void
@@ -625,20 +592,37 @@ function HomeTab({
       </div>
 
       {/* Action Cards - Clear Next Steps */}
-          {/* Take Assessment */}
-          <button
-            onClick={onStartAssessment}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-6 text-left hover:shadow-lg transition-all w-full"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl mb-2">📊</div>
-                <h3 className="text-lg font-semibold mb-1">Take Skills Assessment</h3>
-                <p className="text-green-100 text-sm">Discover your tech career potential</p>
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900">What would you like to do next?</h2>
+        
+        <div className="grid grid-cols-1 gap-4">
+          {/* Continue Current Module */}
+          {activePath && (
+            <button
+              onClick={() => onStartModule(activePath.id)}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-6 text-left hover:shadow-lg transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl mb-2">🎯</div>
+                  <h3 className="text-lg font-semibold mb-1">Continue Current Module</h3>
+                  <p className="text-blue-100 text-sm mb-2">{activePath.title}</p>
+                  <div className="flex items-center space-x-2 text-sm">
+                    <div className="w-20 bg-white/20 rounded-full h-2">
+                      <div 
+                        className="bg-white h-2 rounded-full" 
+                        style={{ width: `${activePath.progress}%` }}
+                      ></div>
+                    </div>
+                    <span>{activePath.progress}% complete</span>
+                  </div>
+                </div>
+                <div className="text-3xl">→</div>
               </div>
-              <div className="text-3xl">→</div>
-            </div>
-          </button>
+            </button>
+          )}
+
+
 
       {/* Daily Task */}
       {userProgress.achievements.length > 0 && (

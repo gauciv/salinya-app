@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Upload, FileText, CheckCircle, X, AlertCircle } from "lucide-react"
+import { Upload, FileText, CheckCircle, X, AlertCircle, Brain } from "lucide-react"
 
 interface EnhancedResumeUploadProps {
   onComplete: (resumeData: any) => void
@@ -15,20 +15,26 @@ interface EnhancedResumeUploadProps {
 interface UploadState {
   file: File | null
   uploading: boolean
+  analyzing: boolean
   progress: number
   error: string
   success: boolean
-  extractedData: any
+  resumeId: string | null
+  analysisResults: any
+  currentStep: string
 }
 
 export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: EnhancedResumeUploadProps) {
   const [uploadState, setUploadState] = useState<UploadState>({
     file: null,
     uploading: false,
+    analyzing: false,
     progress: 0,
     error: '',
     success: false,
-    extractedData: null
+    resumeId: null,
+    analysisResults: null,
+    currentStep: 'idle'
   })
 
   const updateState = (updates: Partial<UploadState>) => {
@@ -98,7 +104,7 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
   const uploadToAPI = async () => {
     if (!uploadState.file) return
     
-    updateState({ uploading: true, progress: 0, error: '' })
+    updateState({ uploading: true, progress: 10, error: '', currentStep: 'Uploading file...' })
 
     try {
       // Convert file to base64
@@ -106,17 +112,17 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
       const base64Promise = new Promise<string>((resolve, reject) => {
         fileReader.onload = () => {
           const result = fileReader.result as string
-          const base64 = result.split(',')[1] // Remove data:type;base64, prefix
+          const base64 = result.split(',')[1]
           resolve(base64)
         }
         fileReader.onerror = reject
         fileReader.readAsDataURL(uploadState.file!)
       })
 
-      updateState({ progress: 20 })
+      updateState({ progress: 20, currentStep: 'Processing file...' })
       const base64Content = await base64Promise
       
-      updateState({ progress: 40 })
+      updateState({ progress: 30, currentStep: 'Sending to server...' })
       
       // Upload to API
       const apiUrl = process.env.NEXT_PUBLIC_RESUME_API_URL
@@ -132,41 +138,91 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
         })
       })
 
-      updateState({ progress: 80 })
-      
       const result = await response.json()
       
       if (!response.ok) {
         throw new Error(result.message || 'Upload failed')
       }
 
-      updateState({ progress: 100 })
-      
-      // Mock extracted data for demo
-      const mockExtractedData = {
-        resumeId: result.resume_id,
-        status: result.status,
-        skills: [
-          { name: 'Customer Service', level: 90, category: 'Communication' },
-          { name: 'Problem Solving', level: 85, category: 'Analytical' },
-          { name: 'Team Leadership', level: 80, category: 'Management' },
-          { name: 'Technical Support', level: 75, category: 'Technical' },
-          { name: 'Process Improvement', level: 70, category: 'Operations' }
-        ]
-      }
-
       updateState({ 
-        success: true, 
+        progress: 50, 
         uploading: false, 
-        extractedData: mockExtractedData 
+        analyzing: true,
+        resumeId: result.resume_id,
+        currentStep: 'AI analyzing your resume...'
       })
+
+      // Start polling for analysis results
+      pollForResults(result.resume_id)
 
     } catch (error) {
       updateState({ 
         error: error instanceof Error ? error.message : 'Upload failed. Please try again.', 
-        uploading: false 
+        uploading: false,
+        analyzing: false,
+        currentStep: 'idle'
       })
     }
+  }
+
+  const pollForResults = async (resumeId: string) => {
+    const maxAttempts = 30 // 5 minutes max
+    let attempts = 0
+    
+    const poll = async () => {
+      try {
+        attempts++
+        const apiUrl = process.env.NEXT_PUBLIC_RESUME_API_URL
+        const response = await fetch(`${apiUrl}/status/${resumeId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`API Error: ${response.status} - ${errorText}`)
+        }
+        
+        const data = await response.json()
+
+        // Update progress based on status
+        if (data.status === 'processing') {
+          const progressValue = Math.min(50 + (attempts * 2), 90)
+          updateState({ 
+            progress: progressValue,
+            currentStep: attempts < 5 ? 'Extracting text from resume...' : 
+                       attempts < 15 ? 'AI analyzing skills and experience...' :
+                       'Generating compatibility insights...'
+          })
+          
+          if (attempts < maxAttempts) {
+            setTimeout(poll, 10000) // Poll every 10 seconds
+          } else {
+            throw new Error('Analysis timeout - please try again')
+          }
+        } else if (data.status === 'completed') {
+          updateState({
+            progress: 100,
+            analyzing: false,
+            success: true,
+            analysisResults: data.analysis_results,
+            currentStep: 'Analysis complete!'
+          })
+        } else if (data.status === 'failed') {
+          throw new Error(data.error_message || 'Analysis failed')
+        }
+      } catch (error) {
+        updateState({
+          error: error instanceof Error ? error.message : 'Analysis failed. Please try again.',
+          analyzing: false,
+          currentStep: 'idle'
+        })
+      }
+    }
+    
+    poll()
   }
 
   const handleUpload = () => {
@@ -178,7 +234,8 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
     onComplete({
       resumeUploaded: true,
       fileName: uploadState.file?.name,
-      extractedData: uploadState.extractedData,
+      resumeId: uploadState.resumeId,
+      analysisResults: uploadState.analysisResults,
       uploadedAt: new Date().toISOString()
     })
   }
@@ -189,7 +246,11 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
       error: '', 
       success: false, 
       progress: 0, 
-      extractedData: null 
+      analyzing: false,
+      uploading: false,
+      resumeId: null,
+      analysisResults: null,
+      currentStep: 'idle'
     })
   }
 
@@ -276,28 +337,37 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
                 )}
               </div>
 
-              {/* Upload Progress */}
-              {uploadState.uploading && (
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">
-                      {uploadState.progress < 100 ? 'Uploading...' : 'Extracting skills...'}
-                    </span>
-                    <span className="text-gray-900 font-medium">{uploadState.progress}%</span>
+              {/* Upload/Analysis Progress */}
+              {(uploadState.uploading || uploadState.analyzing) && (
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <Brain className="h-5 w-5 text-blue-600 animate-pulse" />
+                    <div className="flex-1">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">{uploadState.currentStep}</span>
+                        <span className="text-gray-900 font-medium">{uploadState.progress}%</span>
+                      </div>
+                      <Progress value={uploadState.progress} className="h-2" />
+                    </div>
                   </div>
-                  <Progress value={uploadState.progress} className="h-2" />
+                  {uploadState.analyzing && (
+                    <div className="text-xs text-gray-500 text-center">
+                      AI is analyzing your resume - this may take 1-3 minutes
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Success State */}
-              {uploadState.success && (
+              {uploadState.success && uploadState.analysisResults && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                   <div className="flex items-center space-x-3">
                     <CheckCircle className="h-6 w-6 text-green-600" />
                     <div>
-                      <p className="font-semibold text-green-800">Resume processed successfully!</p>
+                      <p className="font-semibold text-green-800">AI Analysis Complete!</p>
                       <p className="text-sm text-green-700">
-                        We extracted {uploadState.extractedData?.skills?.length || 0} skills and your work experience
+                        Compatibility Score: {uploadState.analysisResults.compatibility_score}% • 
+                        {uploadState.analysisResults.top_technical_skills_found?.length || 0} skills identified
                       </p>
                     </div>
                   </div>
@@ -305,12 +375,12 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
               )}
 
               {/* Upload Button */}
-              {!uploadState.uploading && !uploadState.success && (
+              {!uploadState.uploading && !uploadState.analyzing && !uploadState.success && (
                 <Button
                   onClick={uploadToAPI}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11"
                 >
-                  Process Resume with AI
+                  Analyze Resume with AI
                 </Button>
               )}
             </div>
@@ -326,45 +396,68 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
         </div>
       )}
 
-      {/* Extracted Skills Preview */}
-      {uploadState.success && uploadState.extractedData && (
+      {/* AI Analysis Results */}
+      {uploadState.success && uploadState.analysisResults && (
         <Card className="rounded-2xl border border-gray-200">
           <CardContent className="p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Extracted Skills</h3>
-            <div className="grid grid-cols-1 gap-3">
-              {uploadState.extractedData.skills.slice(0, 5).map((skill: any, index: number) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-gray-900">{skill.name}</span>
-                    <span className="text-sm text-gray-500 ml-2">({skill.category})</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-16 h-2 bg-gray-200 rounded-full">
-                      <div 
-                        className="h-2 bg-blue-500 rounded-full transition-all duration-1000"
-                        style={{ width: `${skill.level}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium text-gray-700">{skill.level}%</span>
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-1">
+                  {uploadState.analysisResults.compatibility_score}%
+                </div>
+                <p className="text-sm text-gray-600">Tech Career Compatibility</p>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Top Technical Skills Found</h3>
+                <div className="flex flex-wrap gap-2">
+                  {uploadState.analysisResults.top_technical_skills_found?.map((skill: string, index: number) => (
+                    <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              {uploadState.analysisResults.compatibility_explanation && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Analysis Summary</h3>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {uploadState.analysisResults.compatibility_explanation}
+                  </p>
+                </div>
+              )}
+              
+              {uploadState.analysisResults.suggested_keywords?.length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Suggested Keywords</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {uploadState.analysisResults.suggested_keywords.map((keyword: string, index: number) => (
+                      <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
+                        {keyword}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
       )}
 
       {/* Benefits */}
-      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-        <h3 className="font-semibold text-blue-800 mb-2">Why upload your resume?</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>✓ AI extracts your transferable skills automatically</li>
-          <li>✓ Better career match recommendations</li>
-          <li>✓ Personalized learning path based on experience</li>
-          <li>✓ Faster profile setup</li>
-          <li>✓ Enhanced job placement assistance</li>
-        </ul>
-      </div>
+      {!uploadState.success && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+          <h3 className="font-semibold text-blue-800 mb-2">AI-Powered Resume Analysis</h3>
+          <ul className="text-sm text-blue-700 space-y-1">
+            <li>✓ Real compatibility scoring for tech careers</li>
+            <li>✓ Identifies your transferable technical skills</li>
+            <li>✓ Personalized career transition roadmap</li>
+            <li>✓ Skills gap analysis and recommendations</li>
+            <li>✓ Resume optimization suggestions</li>
+          </ul>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex flex-col space-y-3">
@@ -373,21 +466,22 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
             onClick={handleComplete}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11 font-semibold"
           >
-            Continue with Enhanced Profile
+            Continue with AI Analysis Results
           </Button>
         ) : (
           <Button
             onClick={onSkip}
             variant="outline"
             className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl h-11 font-semibold"
+            disabled={uploadState.uploading || uploadState.analyzing}
           >
-            Skip for Now
+            {uploadState.uploading || uploadState.analyzing ? 'Processing...' : 'Skip for Now'}
           </Button>
         )}
       </div>
 
       <p className="text-xs text-gray-500 text-center">
-        Your resume is processed securely and never shared without your permission
+        Your resume is analyzed securely using AWS AI services and never shared without permission
       </p>
     </div>
   )

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, Upload, MessageSquare, Target, Zap, CheckCircle } from "lucide-react"
+import EnhancedResumeUpload from "./enhanced-resume-upload"
 
 interface OnboardingFlowProps {
   onComplete: (userData: any) => void
@@ -31,6 +32,7 @@ interface UserData {
   assessmentType: string
   assessmentAnswers: AssessmentAnswer[]
   skills: Skill[]
+  analysisResults?: any
   email: string
   name: string
   phone: string
@@ -42,6 +44,7 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
     assessmentType: "",
     assessmentAnswers: [],
     skills: [],
+    analysisResults: null,
     email: "",
     name: "",
     phone: "",
@@ -51,7 +54,6 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
   const steps = [
     "skills_scanner_choice",
     "assessment_execution",
-    "compatibility_analysis",
     "roadmap_preview",
     "registration_gate",
   ]
@@ -183,15 +185,11 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
     // Calculate skills based on answers - following business logic from context
     const calculatedSkills = calculateSkillsFromAssessment(answers)
     setUserData((prev) => ({ ...prev, assessmentAnswers: answers, skills: calculatedSkills }))
-    setCurrentStep(2)
-  }
-
-  const handleCompatibilityComplete = () => {
-    setCurrentStep(3)
+    setCurrentStep(2) // Skip compatibility analysis, go directly to roadmap
   }
 
   const handleRoadmapComplete = () => {
-    setCurrentStep(4)
+    setCurrentStep(3)
   }
 
   const handleRegistration = (formData: any) => {
@@ -207,15 +205,48 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
     }
   }
 
-  // Skills calculation following business logic from context
+  // Skills calculation from real assessment answers
   const calculateSkillsFromAssessment = (answers: AssessmentAnswer[]): Skill[] => {
-    return [
-      { name: "Customer Service", level: 85, techEquivalent: "User Experience Understanding" },
-      { name: "Problem Solving", level: 90, techEquivalent: "Debugging & QA Testing" },
-      { name: "Documentation", level: 75, techEquivalent: "Technical Writing" },
-      { name: "Training & Mentoring", level: 80, techEquivalent: "Team Leadership" },
-      { name: "Process Optimization", level: 78, techEquivalent: "DevOps & Automation" },
-    ]
+    const skillMap: { [key: string]: { level: number; techEquivalent: string } } = {}
+    
+    answers.forEach(answer => {
+      switch (answer.category) {
+        case "experience":
+          if (answer.questionId === 1) {
+            const experienceLevel = typeof answer.answer === 'string' && answer.answer.includes('5+') ? 90 : 
+                                   typeof answer.answer === 'string' && answer.answer.includes('3-5') ? 80 : 
+                                   typeof answer.answer === 'string' && answer.answer.includes('1-2') ? 70 : 60
+            skillMap["Customer Service"] = { level: experienceLevel, techEquivalent: "User Experience Understanding" }
+          }
+          break
+        case "skills":
+          if (answer.questionId === 4 && typeof answer.answer === 'number') {
+            skillMap["Problem Solving"] = { level: answer.answer * 20, techEquivalent: "Debugging & QA Testing" }
+          }
+          if (answer.questionId === 6 && typeof answer.answer === 'number') {
+            skillMap["Documentation"] = { level: answer.answer * 18, techEquivalent: "Technical Writing" }
+          }
+          break
+        case "technical_aptitude":
+          if (answer.questionId === 10) {
+            const hasExperience = answer.answer === "yes" ? 85 : 60
+            skillMap["Technical Systems"] = { level: hasExperience, techEquivalent: "System Administration" }
+          }
+          break
+        case "communication":
+          if (answer.questionId === 13 && typeof answer.answer === 'number') {
+            skillMap["Communication"] = { level: answer.answer * 19, techEquivalent: "Technical Communication" }
+          }
+          break
+      }
+    })
+    
+    // Convert to array format
+    return Object.entries(skillMap).map(([name, data]) => ({
+      name,
+      level: data.level,
+      techEquivalent: data.techEquivalent
+    }))
   }
 
   return (
@@ -234,7 +265,7 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
           <div className="flex-1 mx-4">
             <Progress value={progress} className="h-2 rounded-full" />
           </div>
-          <span className="text-sm text-text-tertiary font-medium">{currentStep + 1}/6</span>
+          <span className="text-sm text-text-tertiary font-medium">{currentStep + 1}/{steps.length}</span>
         </div>
       </header>
 
@@ -309,21 +340,17 @@ export default function OnboardingFlow({ onComplete, onBack }: OnboardingFlowPro
             />
           )}
 
-          {/* Step 3: Compatibility Analysis */}
+          {/* Step 3: Roadmap Preview */}
           {currentStep === 2 && (
-            <CompatibilityAnalysis skills={userData.skills} onContinue={handleCompatibilityComplete} />
-          )}
-
-          {/* Step 4: Roadmap Preview */}
-          {currentStep === 3 && (
             <RoadmapPreview
               skills={userData.skills}
+              userData={userData}
               onContinue={handleRoadmapComplete}
             />
           )}
 
-          {/* Step 5: Registration Gate */}
-          {currentStep === 4 && <RegistrationGate onComplete={handleRegistration} />}
+          {/* Step 4: Registration Gate */}
+          {currentStep === 3 && <RegistrationGate onComplete={handleRegistration} />}
         </div>
       </div>
     </div>
@@ -359,37 +386,35 @@ function AssessmentComponent({
 
   if (type === "resume_upload") {
     return (
-      <div className="space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-text-primary mb-2">
-            Upload Your Resume
-          </h1>
-          <p className="text-text-secondary">AI will analyze your resume for skills (max 5MB)</p>
-        </div>
-
-        <Card className="rounded-xl border-border-default">
-          <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 rounded-lg flex items-center justify-center mx-auto mb-4 bg-background-card1">
-              <Upload className="h-8 w-8 text-brand-primary" />
-            </div>
-            <h3 className="font-semibold mb-2 text-text-primary">
-              Drop your resume here
-            </h3>
-            <p className="text-sm text-text-secondary mb-4">
-              PDF, DOCX, or TXT (max 5MB)
-            </p>
-            <Button
-              className="w-full h-11 rounded-xl bg-brand-primary hover:bg-brand-primaryDark focus:ring-2 focus:ring-border-focus text-text-onPrimary font-semibold"
-              onClick={() => {
-                // TODO: Implement actual file upload
-                console.log('Resume upload clicked')
-              }}
-            >
-              Choose File
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <EnhancedResumeUpload
+        onComplete={(resumeData) => {
+          // Convert resume analysis to assessment format and store real data
+          const analysisResults = resumeData.analysisResults
+          if (analysisResults && analysisResults.compatibility_score) {
+            // Store real AI analysis results
+            setUserData(prev => ({ 
+              ...prev, 
+              analysisResults,
+              skills: analysisResults.top_technical_skills_found?.map((skill: string, index: number) => ({
+                name: skill,
+                level: Math.max(60, analysisResults.compatibility_score - (index * 5)),
+                techEquivalent: `Tech ${skill}`
+              })) || []
+            }))
+            // Create minimal assessment answers to maintain flow
+            const answers: AssessmentAnswer[] = [
+              { questionId: 1, answer: analysisResults.compatibility_score > 80 ? "5+ years" : "3-5 years", category: "experience" },
+            ]
+            onComplete(answers)
+          } else {
+            onComplete([])
+          }
+        }}
+        onSkip={() => {
+          // Skip to manual assessment
+          onComplete([])
+        }}
+      />
     )
   }
 
@@ -472,142 +497,42 @@ function AssessmentComponent({
   )
 }
 
-// Compatibility Analysis Component - Design system compliant
-function CompatibilityAnalysis({ skills, onContinue }: { skills: Skill[]; onContinue: () => void }) {
-  // Compatibility scoring from business logic: 70% skill match, 25% market demand, 5% transition history
-  const compatibilityScore = 92
-  const skillMatchScore = 88
-  const marketDemandScore = 95
-  const transitionSuccessScore = 85
 
-  return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-background-card2">
-          <Target className="h-8 w-8 text-brand-secondary" />
-        </div>
-        <h1 className="text-2xl font-bold text-text-primary mb-2">
-          Your Skills Analysis
-        </h1>
-        <p className="text-text-secondary">Here's how your BPO skills translate to tech careers</p>
-      </div>
-
-      {/* Overall Compatibility Score */}
-      <Card className="rounded-xl border-brand-primary bg-background-card1">
-        <CardContent className="p-6 text-center">
-          <div className="text-4xl font-bold mb-2 text-brand-primary">
-            {compatibilityScore}%
-          </div>
-          <h3 className="font-semibold text-lg text-brand-primary">
-            Tech Career Compatibility
-          </h3>
-          <p className="text-sm mt-2 text-brand-primary">
-            Excellent match! Your BPO skills are highly valuable in tech.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Skills Translation */}
-      <div className="space-y-4">
-        {skills.map((skill, index) => (
-          <Card key={index} className="rounded-xl border-border-default">
-            <CardContent className="p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="font-semibold text-text-primary">{skill.name}</h3>
-                  <p className="text-sm text-text-secondary">→ {skill.techEquivalent}</p>
-                </div>
-                <span className="text-lg font-bold text-states-success">
-                  {skill.level}%
-                </span>
-              </div>
-              <div className="w-full bg-border-default rounded-full h-2">
-                <div
-                  className="h-2 rounded-full transition-all duration-500 bg-states-success"
-                  style={{ width: `${skill.level}%` }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Detailed Scoring */}
-      <Card className="rounded-xl border-border-default">
-        <CardContent className="p-4">
-          <h3 className="font-semibold mb-3 text-text-primary">
-            Compatibility Breakdown
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-text-secondary">Skill Match (70%)</span>
-              <span className="font-semibold text-text-primary">{skillMatchScore}%</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-text-secondary">Market Demand (25%)</span>
-              <span className="font-semibold text-text-primary">{marketDemandScore}%</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-text-secondary">Transition Success Rate (5%)</span>
-              <span className="font-semibold text-text-primary">{transitionSuccessScore}%</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Top Career Match */}
-      <Card className="rounded-xl border-brand-secondary bg-background-card2">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-3">
-            <Zap className="h-6 w-6 text-brand-secondary" />
-            <div>
-              <h3 className="font-semibold text-text-onSecondary">
-                Top Career Match
-              </h3>
-              <p className="text-sm text-text-onSecondary">
-                Quality Assurance Tester (92% compatibility)
-              </p>
-              <p className="text-xs mt-1 text-text-onSecondary">
-                Expected salary: ₱45,000 - ₱75,000
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Button
-        onClick={onContinue}
-        className="w-full h-11 rounded-xl bg-brand-primary hover:bg-brand-primaryDark focus:ring-2 focus:ring-border-focus text-text-onPrimary font-semibold"
-      >
-        See My Learning Roadmap
-      </Button>
-    </div>
-  )
-}
 
 // Roadmap Preview Component - Design system compliant
 function RoadmapPreview({
   skills,
+  userData,
   onContinue,
-}: { skills: Skill[]; onContinue: () => void }) {
+}: { skills: Skill[]; userData: UserData; onContinue: () => void }) {
+  // Use real AI analysis data when available
+  const analysisResults = userData.analysisResults
+  const compatibilityScore = analysisResults?.compatibility_score || 0
+  const avgSkillLevel = skills.length > 0 ? skills.reduce((sum, skill) => sum + skill.level, 0) / skills.length : compatibilityScore || 50
+  const hasHighTechSkills = analysisResults?.top_technical_skills_found?.length > 3 || skills.some(skill => skill.name.toLowerCase().includes('technical') && skill.level > 75)
+  
   const phases = [
     {
       name: "Foundation Phase",
-      duration: "3 months",
-      description: "Basic tech concepts and industry orientation",
-      modules: ["Tech Industry Basics", "HTML & CSS Fundamentals", "Software Testing Intro", "Communication in Tech"],
+      duration: hasHighTechSkills ? "2 months" : "3 months",
+      description: avgSkillLevel > 75 ? "Advanced tech concepts and specialization" : "Basic tech concepts and industry orientation",
+      modules: hasHighTechSkills ? 
+        ["Advanced Programming Concepts", "System Design Basics", "DevOps Fundamentals", "Tech Leadership"] :
+        ["Tech Industry Basics", "HTML & CSS Fundamentals", "Software Testing Intro", "Communication in Tech"],
       timeCommitment: "1-2 hours/day",
     },
     {
       name: "Skill Building Phase",
-      duration: "6 months",
+      duration: hasHighTechSkills ? "4 months" : "6 months",
       description: "Core technical skills development",
-      modules: ["JavaScript Basics", "Test Automation", "API Testing", "Database Fundamentals"],
+      modules: hasHighTechSkills ?
+        ["Advanced JavaScript", "Cloud Technologies", "Database Design", "API Development"] :
+        ["JavaScript Basics", "Test Automation", "API Testing", "Database Fundamentals"],
       timeCommitment: "2-3 hours/day",
     },
     {
       name: "Job Preparation Phase",
-      duration: "9 months",
+      duration: hasHighTechSkills ? "6 months" : "9 months",
       description: "Portfolio building and interview preparation",
       modules: ["Portfolio Development", "Interview Preparation", "Salary Negotiation", "Job Application Strategy"],
       timeCommitment: "1-2 hours/day",
@@ -620,7 +545,17 @@ function RoadmapPreview({
         <h1 className="text-2xl font-bold text-text-primary mb-2">
           Your Personalized Roadmap
         </h1>
-        <p className="text-text-secondary">Based on your skills and experience</p>
+        <p className="text-text-secondary">
+          {analysisResults ? 'Based on AI analysis of your resume' : 'Based on your skills and experience'}
+        </p>
+        {analysisResults && (
+          <div className="mt-4 p-4 bg-background-card1 rounded-xl">
+            <div className="text-3xl font-bold text-brand-primary mb-1">
+              {compatibilityScore}%
+            </div>
+            <p className="text-sm text-brand-primary">Tech Career Compatibility</p>
+          </div>
+        )}
       </div>
 
       {/* Timeline Visualization */}
@@ -665,10 +600,10 @@ function RoadmapPreview({
             Estimated Timeline
           </h3>
           <p className="text-sm text-states-success">
-            With 1-2 hours daily commitment, you'll be job-ready in <strong>9 months</strong>
+            With 1-2 hours daily commitment, you'll be job-ready in <strong>{hasHighTechSkills ? '6' : avgSkillLevel > 70 ? '7-8' : '9'} months</strong>
           </p>
           <p className="text-xs mt-2 text-states-success">
-            Flexible schedule - learn at your own pace while working
+            {hasHighTechSkills ? 'Fast-track available due to your technical background' : 'Flexible schedule - learn at your own pace while working'}
           </p>
         </CardContent>
       </Card>

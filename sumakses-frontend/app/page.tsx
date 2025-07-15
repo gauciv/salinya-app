@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { ArrowLeft, CheckCircle, Target, Shield } from "lucide-react"
 import LandingPage from "@/components/landing-page"
-import EpicOnboardingFlow, { PersonalInfoForm, WorkDetailsForm, ResumeUploadForm, SetupLoading } from "@/components/epic-onboarding-flow"
+import OnboardingFlow from "@/components/onboarding-flow"
 import MainApp from "@/components/main-app"
 import LoginPage from "@/components/login-page"
 import EnhancedResumeUpload from "@/components/enhanced-resume-upload"
@@ -285,7 +285,7 @@ export default function Home() {
   }
 
   if (currentView === "onboarding") {
-    return <EpicOnboardingFlow onComplete={handleOnboardingComplete} onBack={handleBackToLanding} />
+    return <OnboardingFlow onComplete={handleOnboardingComplete} onBack={handleBackToLanding} />
   }
 
   if (currentView === "results") {
