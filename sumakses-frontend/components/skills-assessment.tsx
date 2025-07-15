@@ -154,7 +154,7 @@ export default function SkillsAssessment({ onComplete, type }: SkillsAssessmentP
     
     // Simulate AI processing steps
     const runAssessment = async () => {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < assessmentSteps.length; i++) {
         setCurrentStep(i)
         await new Promise((resolve) => setTimeout(resolve, assessmentSteps[i].duration))
       }
