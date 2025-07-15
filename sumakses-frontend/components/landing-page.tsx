@@ -19,13 +19,13 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
   const successStories = [
     {
       id: 1,
-      name: "Maria Santos",
+      name: "France Stantos",
       role: "Customer Service → Web Developer",
       company: "Healthcare BPO → Tech Startup",
       salary: "₱22K → ₱65K",
       duration: "8 months",
       location: "Quezon City",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "/France.png?height=200&width=300",
       videoLength: 30,
       quote: "Hindi ko inakala na ang customer service skills ko ay magiging foundation ng tech career ko!",
       story:
@@ -39,7 +39,7 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
       salary: "₱35K → ₱95K",
       duration: "6 months",
       location: "Cebu City",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "/Jose.png?height=200&width=300",
       videoLength: 30,
       quote: "My leadership experience in BPO was exactly what tech companies needed.",
       story:
@@ -47,13 +47,13 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
     },
     {
       id: 3,
-      name: "Ana Reyes",
+      name: "Yurii Yankin",
       role: "Technical Support → QA Engineer",
       company: "Software Support BPO → Cloud Company",
       salary: "₱28K → ₱70K",
       duration: "7 months",
       location: "Davao City",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "/Yuri.png?height=200&width=300",
       videoLength: 30,
       quote: "Troubleshooting customer issues prepared me perfectly for software testing!",
       story:
@@ -106,15 +106,15 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
       {/* Scrollable Main Content */}
       <div className="flex-1 overflow-y-auto" style={{ paddingBottom: '120px' }}>
         {/* Hero Section */}
-        <section className="px-4 py-8">
+        <section className="px-4 py-4">
           <div className="max-w-md mx-auto text-center">
             <h1 className="text-3xl font-bold mb-4 text-gray-900">
-              Turn Your <span className="text-blue-600">BPO Experience</span> Into Tech Success
+              Pressure to grow, no room to breathe? <span className="text-blue-600">Not anymore.</span>
             </h1>
             <p className="text-lg text-gray-600 mb-6">
-              Your customer service and problem-solving skills are the perfect foundation for a tech career. Join thousands of Filipinos who made the switch.
+              Work and life relentless? Learning feels impossible? You have hidden skills. Find a path that fits your life.
             </p>
-            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
               <p className="text-sm text-blue-900">
                 <strong>Kumusta!</strong> Your BPO skills are perfect for tech careers. Let us show you how! 🇵🇭
               </p>
@@ -123,10 +123,10 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
         </section>
 
         {/* Simple Success Stories */}
-        <section className="px-4 py-6">
+        <section className="px-4">
           <div className="max-w-md mx-auto">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Success Stories</h2>
+            <div className="text-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Success Stories</h2>
               <p className="text-gray-600">Real stories from Filipino BPO professionals</p>
             </div>
 
@@ -136,7 +136,7 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
                   <img
                     src={successStories[currentStory].image || "/placeholder.svg"}
                     alt={successStories[currentStory].name}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-fill"
                   />
 
                   {/* Video Progress Bar */}
@@ -213,7 +213,7 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
         </section>
 
         {/* Simple Social Proof */}
-        <section className="px-4 py-6">
+        <section className="px-4 py-6 mb-6">
           <div className="max-w-md mx-auto">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="flex flex-col items-center">
@@ -242,62 +242,6 @@ export default function LandingPage({ onStartJourney, onLoginClick }: LandingPag
             </div>
           </div>
         </section>
-
-        {/* Enhanced CTA Section */}
-        <section className="px-4 py-8">
-          <div className="max-w-md mx-auto text-center">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 mb-6">
-              <div className="text-4xl mb-3">🚀</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3">
-                Ready to Transform Your Career?
-              </h2>
-              <p className="text-gray-700 mb-4 font-medium">
-                Take our smart 5-minute assessment and discover:
-              </p>
-              
-              <div className="space-y-3 text-left">
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">✓</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Your perfect tech career match</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">✓</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Exact salary potential (₱35K - ₱120K+)</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">✓</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Personalized learning roadmap</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">✓</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Timeline to your new career</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-4">
-              <p className="text-sm text-yellow-800 font-medium">
-                ⚡ <strong>Limited Time:</strong> Get instant results + free mentorship session!
-              </p>
-            </div>
-            
-            <p className="text-xs text-gray-500 mb-2">
-              ✅ No credit card required • ✅ 100% Free • ✅ Instant results
-            </p>
-            <p className="text-xs text-gray-500">
-              Join 2,000+ Filipino professionals who made the switch 🇵🇭
-            </p>
-          </div>
-        </section>
-
         {/* Simple Footer */}
       </div>
       {/* Fixed CTA Buttons at Bottom */}
