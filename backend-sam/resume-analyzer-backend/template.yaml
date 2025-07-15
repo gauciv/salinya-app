@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  resume-analyzer-backend
+
+  SAM Template for a resume analysis backend using S3, SQS, DynamoDB, Lambda, API Gateway, and Amazon Bedrock (Claude Sonnet).
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512 # Corrected from 'Memory' to 'MemorySize'
+    Architectures:
+      - x86_64
+    LoggingConfig:
+      LogFormat: JSON
+      ApplicationLogLevel: INFO
+      SystemLogLevel: INFO
+
+Resources:
+  UploadResumeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: upload_resume_function/
+      Handler: app.lambda_handler
+      Runtime: python3.13
+      MemorySize: 256 # Corrected from 'Memory' to 'MemorySize'
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+                - s3:PutObject
+              Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+                - dynamodb:UpdateItem
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTableName}"
+            - Effect: Allow
+              Action:
+                - sqs:SendMessage
+              Resource: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${SQSQueueName}"
+      Environment:
+        Variables:
+          S3_BUCKET_NAME: !Ref S3BucketName
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
+          SQS_QUEUE_URL: !Ref SQSQueueUrl # Still use QueueUrl for the Lambda environment variable
+      Events:
+        UploadResumeApi:
+          Type: Api
+          Properties:
+            Path: /upload-resume
+            Method: post
+            RestApiId: !Ref ResumeAnalyzerApi
+
+  ProcessResumeAnalysisFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: process_resume_function/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      MemorySize: 1024 # Corrected from 'Memory' to 'MemorySize'
+      Timeout: 25
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+            - Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTableName}"
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource: "*"
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+      Events:
+        SQSQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${SQSQueueName}"
+            BatchSize: 1
+
+  GetResumeStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get_status_function/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      MemorySize: 128 # Corrected from 'Memory' to 'MemorySize'
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTableName}"
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTableName
+      Events:
+        GetStatusApi:
+          Type: Api
+          Properties:
+            Path: /resume-status/{resume_id}
+            Method: get
+            RestApiId: !Ref ResumeAnalyzerApi
+
+  ResumeAnalyzerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      # FIX: Removed 'DefinitionFormat: OpenAPI' as it's not needed here
+      Auth:
+        DefaultAuthorizer: NONE
+      Cors: # CORS defined here applies to the entire API
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowMethods: "'OPTIONS,POST,GET'"
+        AllowOrigin: "'*'"
+
+
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Name of your existing S3 bucket for resume uploads.
+    Default: "salinya-resume-upload" # CRUCIAL EDIT 5: REPLACE with your actual S3 bucket name
+
+  DynamoDBTableName:
+    Type: String
+    Description: Name of your existing DynamoDB table for resume analysis results.
+    Default: "resume-analysis-results" # CRUCIAL EDIT 6: REPLACE with your actual DynamoDB table name
+
+  SQSQueueName: # NEW PARAMETER: for the SQS policy and SQSQueue resource
+    Type: String
+    Description: Name of your existing SQS queue for resume processing.
+    Default: "salinya-resume-process-queue" # CRUCIAL EDIT 7a: REPLACE with the actual NAME of your SQS queue
+
+  SQSQueueUrl: # Existing parameter for Lambda environment variable
+    Type: String
+    Description: URL of your existing SQS queue for resume processing.
+    Default: "https://sqs.ap-southeast-1.amazonaws.com/058264514399/salinya-resume-process-queue" # CRUCIAL EDIT 7b: REPLACE with the actual URL of your SQS queue
+
+  BedrockModelId:
+    Type: String
+    Description: The exact Model ID for Claude Sonnet (e.g., anthropic.claude-3-5-sonnet-20240620-v1:0)
+    Default: "anthropic.claude-sonnet-4-20250514-v1:0" # CRUCIAL EDIT 8: VERIFY AND UPDATE THIS!
+
+
+Outputs:
+  UploadApiEndpoint:
+    Description: "API Gateway endpoint URL for resume uploads"
+    Value: !Sub "https://${ResumeAnalyzerApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/upload-resume"
+  GetStatusApiEndpoint:
+    Description: "API Gateway base URL for resume status retrieval (append /{resume_id})"
+    Value: !Sub "https://${ResumeAnalyzerApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/resume-status"
