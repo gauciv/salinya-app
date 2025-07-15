@@ -100,24 +100,24 @@ export default function MainApp({ userData }: MainAppProps) {
     achievements: [
       {
         id: "1",
-        title: "First Steps",
-        description: "Completed your first module",
+        title: "Complete a learning chapter",
+        description: "Finish any learing chapter from your roadmap",
         icon: "🎯",
         unlockedAt: "2024-01-15",
         category: "learning"
       },
       {
         id: "2",
-        title: "Week Warrior",
-        description: "7-day learning streak",
-        icon: "🔥",
+        title: "Practice coding",
+        description: "Take a quick 3 question Python coding assessment",
+        icon: "<>",
         unlockedAt: "2024-01-20",
         category: "consistency"
       },
       {
         id: "3",
-        title: "Community Helper",
-        description: "Helped 5 other learners",
+        title: "Community engagement",
+        description: "Engange with the QA Tester community",
         icon: "🤝",
         unlockedAt: "2024-01-18",
         category: "community"
@@ -625,40 +625,10 @@ function HomeTab({
       </div>
 
       {/* Action Cards - Clear Next Steps */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-gray-900">What would you like to do next?</h2>
-        
-        <div className="grid grid-cols-1 gap-4">
-          {/* Continue Current Module */}
-          {activePath && (
-            <button
-              onClick={() => onStartModule(activePath.id)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl p-6 text-left hover:shadow-lg transition-all"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl mb-2">🎯</div>
-                  <h3 className="text-lg font-semibold mb-1">Continue Current Module</h3>
-                  <p className="text-blue-100 text-sm mb-2">{activePath.title}</p>
-                  <div className="flex items-center space-x-2 text-sm">
-                    <div className="w-20 bg-white/20 rounded-full h-2">
-                      <div 
-                        className="bg-white h-2 rounded-full" 
-                        style={{ width: `${activePath.progress}%` }}
-                      ></div>
-                    </div>
-                    <span>{activePath.progress}% complete</span>
-                  </div>
-                </div>
-                <div className="text-3xl">→</div>
-              </div>
-            </button>
-          )}
-
           {/* Take Assessment */}
           <button
             onClick={onStartAssessment}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-6 text-left hover:shadow-lg transition-all"
+            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl p-6 text-left hover:shadow-lg transition-all w-full"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -670,27 +640,10 @@ function HomeTab({
             </div>
           </button>
 
-          {/* Join Community */}
-          <button
-            onClick={onNavigateCommunity}
-            className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-2xl p-6 text-left hover:shadow-lg transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl mb-2">👥</div>
-                <h3 className="text-lg font-semibold mb-1">Connect with Community</h3>
-                <p className="text-orange-100 text-sm">Learn from fellow BPO professionals</p>
-              </div>
-              <div className="text-3xl">→</div>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      {/* Recent Achievements */}
+      {/* Daily Task */}
       {userProgress.achievements.length > 0 && (
         <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Achievements</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Daily Tasks</h2>
           <div className="space-y-3">
             {userProgress.achievements.slice(0, 3).map((achievement) => (
               <div key={achievement.id} className="flex items-center space-x-3 p-3 bg-yellow-50 rounded-2xl">
