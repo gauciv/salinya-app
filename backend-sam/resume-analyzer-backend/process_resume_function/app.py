@@ -53,14 +53,15 @@ def extract_text_from_file_bytes(file_bytes: bytes, file_extension: str) -> str:
 
 
 # Initialize AWS clients
-# Use a retry configuration for Bedrock as it can sometimes have transient errors
+# Optimized configuration for faster processing
 boto3_config = Config(
     retries={
-        'max_attempts': 10,
-        'mode': 'standard'
+        'max_attempts': 3,  # Reduced retries
+        'mode': 'adaptive'
     },
-    connect_timeout=5,  # seconds
-    read_timeout=300 # seconds for Bedrock response
+    connect_timeout=2,  # Faster connection
+    read_timeout=30,    # Reduced read timeout
+    max_pool_connections=10
 )
 s3_client = boto3.client('s3', config=boto3_config)
 dynamodb_client = boto3.client('dynamodb', config=boto3_config)
@@ -69,7 +70,7 @@ bedrock_runtime_client = boto3.client('bedrock-runtime', config=boto3_config)
 
 # Environment variables (set in Lambda Console)
 DYNAMODB_TABLE_NAME = os.environ.get('DYNAMODB_TABLE_NAME')
-BEDROCK_MODEL_ID = os.environ.get('BEDROCK_MODEL_ID') # Will be 'anthropic.claude-sonnet-4-20250514-v1:0'
+BEDROCK_MODEL_ID = os.environ.get('BEDROCK_MODEL_ID', 'anthropic.claude-3-haiku-20240307-v1:0')
 
 def lambda_handler(event, context):
     """
@@ -91,33 +92,38 @@ def lambda_handler(event, context):
             file_bytes = s3_object['Body'].read()
             print(f"Downloaded {len(file_bytes)} bytes.")
 
-            # 2. Extract text from resume
+            # 2. Extract and optimize text from resume
             extracted_text = extract_text_from_file_bytes(file_bytes, file_extension)
             print(f"Extracted {len(extracted_text)} characters from {s3_key}.")
             
-            # Max tokens for Claude Sonnet 4 is 200,000. Truncate if necessary.
-            # 150,000 characters is a safe upper bound, considering tokenization
-            MAX_TEXT_LENGTH = 150000 
-            if len(extracted_text) > MAX_TEXT_LENGTH:
-                print(f"Truncating resume text from {len(extracted_text)} to {MAX_TEXT_LENGTH} characters.")
-                extracted_text = extracted_text[:MAX_TEXT_LENGTH]
+            # Smart truncation - prioritize key sections
+            key_sections = []
+            lines = extracted_text.split('\n')
+            
+            # Look for key sections first
+            for i, line in enumerate(lines):
+                line_lower = line.lower()
+                if any(keyword in line_lower for keyword in ['skill', 'experience', 'work', 'project', 'education', 'technical']):
+                    # Include this line and next 3 lines
+                    key_sections.extend(lines[i:i+4])
+            
+            # Use key sections if found, otherwise use beginning
+            if key_sections:
+                extracted_text = '\n'.join(key_sections[:50])  # Further reduced
+            else:
+                extracted_text = extracted_text[:1500]  # Minimal text for speed
 
-            # 3. Construct prompt for Claude Sonnet 4
-            # CRUCIAL: Refine this prompt for best results! Ask for JSON.
+            # 3. Construct simplified prompt for faster processing
             prompt_template = """
-            You are an expert resume analyzer for technical roles.
-            Given the following resume text, perform a technical compatibility analysis for a general software engineering role.
+            Analyze this resume for tech career compatibility. Return JSON only:
+            {{
+              "compatibility_score": number (0-100),
+              "top_technical_skills_found": ["skill1", "skill2", "skill3"],
+              "compatibility_explanation": "brief explanation",
+              "suggested_keywords": ["keyword1", "keyword2"]
+            }}
 
-            Your analysis should include:
-            1.  A 'compatibility_score' out of 100, where 100 is a perfect fit. This score should reflect how well the candidate's technical skills and experience align with a typical software engineering role (e.g., programming languages, data structures, algorithms, system design, relevant frameworks).
-            2.  A list of 'top_technical_skills_found' (maximum 7 relevant technical skills identified from the resume).
-            3.  A 'compatibility_explanation' detailing why the score was given, highlighting key technical strengths and specific areas for technical improvement for a software engineering role. Be concise and focused on technology.
-            4.  'suggested_keywords' (maximum 5 technical terms or concepts) that, if relevant to the candidate's actual skills, would make the resume more appealing for technical roles.
-
-            Provide the output as a JSON object ONLY. Do not include any other text, preambles, or explanations outside the JSON. Ensure the JSON is valid and complete.
-
-            Resume Text:
-            {resume_text}
+            Resume: {resume_text}
             """
             prompt_text = prompt_template.format(resume_text=extracted_text)
             print(f"Prompt length: {len(prompt_text)} characters.")
@@ -135,8 +141,8 @@ def lambda_handler(event, context):
                         ]
                     }
                 ],
-                "max_tokens": 2000, # Adjust as needed for your desired output length
-                "temperature": 0.1, # Lower for more deterministic, factual output
+                "max_tokens": 300, # Minimal for fastest processing
+                "temperature": 0.7, # Higher for faster generation
                 "top_p": 0.9,
             })
 

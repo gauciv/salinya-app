@@ -25,7 +25,7 @@ def lambda_handler(event, context):
 
     # CORS Headers for API Gateway. Crucial for Next.js frontend.
     headers = {
-        'Access-Control-Allow-Origin': '*', # For hackathon, allows any origin. Harden in production.
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'OPTIONS,POST',
         'Content-Type': 'application/json'

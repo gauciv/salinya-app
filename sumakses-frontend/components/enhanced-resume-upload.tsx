@@ -181,6 +181,11 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
       try {
         attempts++
         const response = await fetch(`/api/resume-status/${resumeId}`)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+        
         const data = await response.json()
 
         // Update progress based on status
