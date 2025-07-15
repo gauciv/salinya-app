@@ -57,19 +57,42 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
 
   const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
-    const file = event.dataTransfer.files[0]
-    if (!file) return
-
-    // Create a synthetic event to reuse validation logic
-    const syntheticEvent = {
-      target: { files: [file] }
-    } as React.ChangeEvent<HTMLInputElement>
+    event.stopPropagation()
     
-    handleFileSelect(syntheticEvent)
-  }, [handleFileSelect])
+    const files = event.dataTransfer.files
+    if (files && files[0]) {
+      const file = files[0]
+      
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain']
+      if (!allowedTypes.includes(file.type)) {
+        updateState({ error: 'Please upload a PDF, DOC, DOCX, or TXT file' })
+        return
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        updateState({ error: 'File size must be less than 5MB' })
+        return
+      }
+
+      updateState({ file, error: '' })
+    }
+  }, [])
 
   const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
+    event.stopPropagation()
+  }, [])
+
+  const handleDragEnter = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }, [])
+
+  const handleDragLeave = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
   }, [])
 
   const uploadToAPI = async () => {
@@ -187,6 +210,14 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
               className="text-center cursor-pointer"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onClick={() => {
+                const input = document.getElementById('resume-upload') as HTMLInputElement
+                if (input) {
+                  input.click()
+                }
+              }}
             >
               <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Upload className="h-8 w-8 text-blue-600" />
@@ -204,15 +235,20 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
                 className="hidden"
                 id="resume-upload"
               />
-              <label htmlFor="resume-upload">
-                <Button
-                  type="button"
-                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-2"
-                  asChild
-                >
-                  <span>Choose File</span>
-                </Button>
-              </label>
+              <Button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  const input = document.getElementById('resume-upload') as HTMLInputElement
+                  if (input) {
+                    input.value = '' // Reset input to allow same file selection
+                    input.click()
+                  }
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 py-2"
+              >
+                Choose File
+              </Button>
               <p className="text-xs text-gray-500 mt-3">
                 Supports PDF, DOC, DOCX, TXT (max 5MB)
               </p>
