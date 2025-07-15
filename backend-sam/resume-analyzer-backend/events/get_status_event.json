@@ -1,0 +1,10 @@
+{
+  "httpMethod": "GET",
+  "path": "/resume-status/test-resume-123",
+  "pathParameters": {
+    "resume_id": "test-resume-123"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}
