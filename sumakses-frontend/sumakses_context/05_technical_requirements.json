@@ -1,0 +1,376 @@
+{
+  "app_name": "SUMAKSES",
+  "version": "1.0.0",
+  "last_updated": "2024-12-19",
+  "technical_architecture": {
+    "platform_approach": "mobile_first",
+    "deployment_strategy": "cloud_native",
+    "architecture_pattern": "microservices",
+    "development_methodology": "agile_scrum"
+  },
+  "technology_stack": {
+    "frontend": {
+      "framework": "React Native",
+      "version": "0.72.x",
+      "rationale": "Single codebase for iOS and Android, faster development for hackathon timeline",
+      "ui_library": "React Native Elements",
+      "navigation": "React Navigation 6",
+      "state_management": "Redux Toolkit",
+      "styling": "Styled Components",
+      "offline_support": "React Native Offline",
+      "push_notifications": "React Native Push Notification"
+    },
+    "backend": {
+      "runtime": "Node.js",
+      "version": "18.x LTS",
+      "framework": "Express.js",
+      "architecture": "RESTful API with GraphQL endpoints",
+      "authentication": "JWT with refresh tokens",
+      "validation": "Joi validation middleware",
+      "security": "Helmet.js, CORS, rate limiting",
+      "logging": "Winston with structured logging",
+      "testing": "Jest + Supertest"
+    },
+    "database": {
+      "primary": {
+        "system": "PostgreSQL",
+        "version": "15.x",
+        "rationale": "ACID compliance, JSON support, scalability",
+        "orm": "Prisma ORM",
+        "connection_pooling": "PgBouncer",
+        "backup_strategy": "Automated daily backups with point-in-time recovery"
+      },
+      "caching": {
+        "system": "Redis",
+        "version": "7.x",
+        "use_cases": ["session_storage", "api_caching", "real_time_data"],
+        "clustering": "Redis Cluster for high availability"
+      },
+      "vector_database": {
+        "system": "Pinecone",
+        "rationale": "Optimized for AI/ML workloads, managed service",
+        "alternative": "Weaviate (if self-hosted required)",
+        "embedding_dimensions": 1536,
+        "index_type": "cosine_similarity"
+      }
+    },
+    "ai_and_ml": {
+      "llm_provider": "OpenAI",
+      "models": {
+        "chat_completion": "gpt-4",
+        "embeddings": "text-embedding-ada-002",
+        "content_generation": "gpt-3.5-turbo",
+        "code_analysis": "gpt-4"
+      },
+      "rag_framework": {
+        "system": "LlamaIndex",
+        "version": "0.9.x",
+        "rationale": "Specified by user, excellent for RAG applications",
+        "components": [
+          "document_loaders",
+          "text_splitters", 
+          "embedding_models",
+          "vector_stores",
+          "retrievers",
+          "query_engines"
+        ]
+      },
+      "ml_pipeline": {
+        "recommendation_engine": "Collaborative and content-based filtering",
+        "skill_assessment": "Natural language processing with classification",
+        "learning_path_generation": "Graph-based algorithms with ML optimization",
+        "progress_prediction": "Time series analysis with regression models"
+      }
+    },
+    "cloud_infrastructure": {
+      "provider": "AWS",
+      "rationale": "Comprehensive service offering, cost-effective for startups",
+      "services": {
+        "compute": "ECS with Fargate (containerized microservices)",
+        "storage": "S3 for files, EBS for databases",
+        "cdn": "CloudFront for global content delivery",
+        "load_balancer": "Application Load Balancer",
+        "monitoring": "CloudWatch + AWS X-Ray",
+        "secrets_management": "AWS Secrets Manager",
+        "ci_cd": "AWS CodePipeline + CodeBuild"
+      },
+      "scaling": {
+        "auto_scaling": "ECS Service Auto Scaling",
+        "database_scaling": "RDS with read replicas",
+        "cache_scaling": "ElastiCache with cluster mode"
+      }
+    },
+    "third_party_integrations": {
+      "authentication": {
+        "social_login": ["Google OAuth 2.0", "Facebook Login"],
+        "sms_verification": "Twilio"
+      },
+      "payments": {
+        "processor": "Stripe",
+        "local_payment": "GCash, PayMaya (Philippines)",
+        "subscription_management": "Stripe Billing"
+      },
+      "communications": {
+        "email": "SendGrid for transactional emails",
+        "push_notifications": "Firebase Cloud Messaging",
+        "sms": "Twilio SMS"
+      },
+      "analytics": {
+        "user_analytics": "Mixpanel",
+        "performance_monitoring": "New Relic",
+        "error_tracking": "Sentry"
+      },
+      "learning_content": {
+        "video_hosting": "Vimeo or AWS CloudFront",
+        "content_partners": ["Coursera API", "Udemy API", "YouTube API"],
+        "document_storage": "AWS S3 with CloudFront CDN"
+      }
+    }
+  },
+  "performance_requirements": {
+    "response_times": {
+      "app_launch": "< 3 seconds",
+      "assessment_processing": "< 30 seconds",
+      "chatbot_response": "< 3 seconds",
+      "content_loading": "< 5 seconds",
+      "database_queries": "< 500ms average"
+    },
+    "throughput": {
+      "concurrent_users": "10,000 initial capacity",
+      "api_requests_per_second": "1,000 RPS",
+      "chat_messages_per_second": "500 messages/second",
+      "assessment_completions_per_hour": "1,000 assessments/hour"
+    },
+    "scalability": {
+      "horizontal_scaling": "Auto-scaling groups with target tracking",
+      "database_scaling": "Read replicas and connection pooling",
+      "cache_scaling": "Redis cluster with automatic failover",
+      "cdn_scaling": "Global CloudFront distribution"
+    },
+    "availability": {
+      "uptime_target": "99.9%",
+      "disaster_recovery": "Multi-AZ deployment",
+      "backup_frequency": "Daily automated backups",
+      "monitoring": "24/7 automated monitoring with alerts"
+    }
+  },
+  "security_requirements": {
+    "authentication": {
+      "method": "JWT with refresh tokens",
+      "session_duration": "24 hours access, 30 days refresh",
+      "multi_factor": "SMS-based 2FA optional",
+      "password_policy": "Minimum 8 characters, complexity requirements"
+    },
+    "data_protection": {
+      "encryption_at_rest": "AES-256 encryption",
+      "encryption_in_transit": "TLS 1.3",
+      "pii_handling": "Encrypted storage, limited access",
+      "gdpr_compliance": "Data portability, right to deletion"
+    },
+    "api_security": {
+      "rate_limiting": "100 requests per minute per user",
+      "cors_policy": "Restricted to approved domains",
+      "input_validation": "Joi validation for all inputs",
+      "sql_injection_prevention": "Parameterized queries via ORM"
+    },
+    "infrastructure_security": {
+      "vpc_configuration": "Private subnets for databases",
+      "security_groups": "Principle of least privilege",
+      "secrets_management": "AWS Secrets Manager",
+      "vulnerability_scanning": "Regular dependency updates"
+    }
+  },
+  "mobile_specific_requirements": {
+    "offline_capabilities": {
+      "content_caching": "Learning materials cached for offline use",
+      "data_sync": "Automatic sync when connection restored",
+      "storage_limit": "500MB offline content per user",
+      "sync_strategy": "Incremental sync to minimize data usage"
+    },
+    "device_compatibility": {
+      "ios_minimum": "iOS 13.0",
+      "android_minimum": "API level 21 (Android 5.0)",
+      "screen_sizes": "5.0 to 6.7 inches optimized",
+      "device_types": "Phones primary, tablets supported"
+    },
+    "performance_optimization": {
+      "bundle_size": "< 50MB initial download",
+      "lazy_loading": "Code splitting for feature modules",
+      "image_optimization": "WebP format, multiple resolutions",
+      "memory_management": "Efficient memory usage, garbage collection"
+    },
+    "cultural_localization": {
+      "languages": ["English", "Filipino (Tagalog)", "Bisaya"],
+      "currency": "Philippine Peso (PHP)",
+      "date_format": "MM/DD/YYYY (Filipino standard)",
+      "number_format": "Comma separators, period decimal"
+    }
+  },
+  "ai_rag_implementation": {
+    "llama_index_configuration": {
+      "document_loaders": [
+        "PDFLoader for course materials",
+        "TextLoader for career guides",
+        "CSVLoader for job market data",
+        "JSONLoader for user profiles"
+      ],
+      "text_processing": {
+        "chunking_strategy": "Semantic chunking with 500 token overlap",
+        "chunk_size": "1000 tokens",
+        "preprocessing": "Remove headers, normalize text, extract metadata"
+      },
+      "embedding_strategy": {
+        "model": "OpenAI text-embedding-ada-002",
+        "dimensions": 1536,
+        "batch_size": 100,
+        "update_frequency": "Real-time for user data, daily for content"
+      },
+      "vector_store": {
+        "primary": "Pinecone",
+        "index_configuration": "Cosine similarity, 1536 dimensions",
+        "namespaces": ["user_profiles", "learning_content", "career_data", "community_posts"]
+      },
+      "retrieval_configuration": {
+        "similarity_threshold": 0.8,
+        "max_retrievals": 5,
+        "reranking": "Cross-encoder reranking for relevance",
+        "context_window": "4000 tokens maximum"
+      }
+    },
+    "chatbot_implementation": {
+      "conversation_flow": {
+        "greeting": "Context-aware greeting based on user progress",
+        "intent_classification": "Multi-intent classification with confidence scores",
+        "response_generation": "Template-based with GPT-4 augmentation",
+        "fallback_handling": "Escalation to human support or predefined responses"
+      },
+      "context_management": {
+        "session_context": "Current learning module, recent activities",
+        "user_context": "Profile data, assessment results, progress",
+        "conversation_history": "Last 10 exchanges maintained",
+        "global_context": "Platform updates, announcements, deadlines"
+      },
+      "response_optimization": {
+        "response_time": "< 3 seconds target",
+        "caching_strategy": "Common responses cached, personalized generated",
+        "streaming": "Stream responses for longer generations",
+        "error_handling": "Graceful degradation with helpful messages"
+      }
+    },
+    "knowledge_base_management": {
+      "content_sources": [
+        "Career transition guides",
+        "Tech industry insights",
+        "Learning resource database",
+        "User progress patterns",
+        "Community discussions",
+        "Job market data",
+        "Skill requirement mappings"
+      ],
+      "update_mechanisms": {
+        "real_time": "User interactions, progress updates",
+        "scheduled": "Daily content updates, weekly market data",
+        "manual": "Curated content additions, policy updates"
+      },
+      "quality_assurance": {
+        "content_validation": "Automated fact-checking, human review",
+        "relevance_scoring": "Machine learning relevance models",
+        "feedback_integration": "User feedback improves responses"
+      }
+    }
+  },
+  "development_environment": {
+    "version_control": {
+      "system": "Git",
+      "hosting": "GitHub",
+      "branching_strategy": "GitFlow",
+      "commit_conventions": "Conventional Commits"
+    },
+    "ci_cd_pipeline": {
+      "continuous_integration": "GitHub Actions",
+      "testing_stages": ["unit", "integration", "e2e"],
+      "deployment_stages": ["development", "staging", "production"],
+      "quality_gates": "Code coverage > 80%, security scans pass"
+    },
+    "development_tools": {
+      "ide": "VS Code with React Native extensions",
+      "testing": "Jest, React Native Testing Library, Detox",
+      "debugging": "Flipper, React Native Debugger",
+      "performance": "React Native Performance Monitor"
+    },
+    "code_quality": {
+      "linting": "ESLint with Airbnb config",
+      "formatting": "Prettier",
+      "type_checking": "TypeScript",
+      "pre_commit_hooks": "Husky with lint-staged"
+    }
+  },
+  "monitoring_and_analytics": {
+    "application_monitoring": {
+      "performance": "New Relic for APM",
+      "errors": "Sentry for error tracking",
+      "logging": "Centralized logging with ELK stack",
+      "alerts": "PagerDuty for critical issues"
+    },
+    "user_analytics": {
+      "behavioral": "Mixpanel for user actions",
+      "engagement": "Custom dashboards for learning metrics",
+      "conversion": "Funnel analysis for key user journeys",
+      "retention": "Cohort analysis for user retention"
+    },
+    "business_metrics": {
+      "learning_progress": "Skills advancement tracking",
+      "career_outcomes": "Job placement success rates",
+      "user_satisfaction": "In-app surveys, NPS tracking",
+      "platform_health": "System performance, uptime monitoring"
+    }
+  },
+  "compliance_and_governance": {
+    "data_privacy": {
+      "gdpr_compliance": "Data portability, consent management",
+      "ccpa_compliance": "California Consumer Privacy Act",
+      "philippines_dpa": "Data Privacy Act of 2012 compliance",
+      "retention_policies": "Data retention schedules, automated deletion"
+    },
+    "accessibility": {
+      "standards": "WCAG 2.1 AA compliance",
+      "mobile_accessibility": "Screen reader support, voice over",
+      "keyboard_navigation": "Full keyboard accessibility",
+      "color_contrast": "Minimum 4.5:1 contrast ratio"
+    },
+    "content_governance": {
+      "moderation": "AI-assisted content moderation",
+      "community_guidelines": "Clear community standards",
+      "reporting_system": "User reporting with rapid response",
+      "appeals_process": "Fair appeals for content decisions"
+    }
+  },
+  "cost_optimization": {
+    "infrastructure_costs": {
+      "aws_reserved_instances": "Reserved instances for predictable workloads",
+      "auto_scaling": "Scale down during low usage periods",
+      "spot_instances": "Spot instances for non-critical workloads",
+      "cost_monitoring": "AWS Cost Explorer with budget alerts"
+    },
+    "third_party_costs": {
+      "openai_optimization": "Efficient prompt engineering, response caching",
+      "vector_database": "Optimize embedding dimensions and queries",
+      "monitoring_tools": "Tiered monitoring based on criticality",
+      "content_delivery": "Optimize CDN usage, image compression"
+    }
+  },
+  "disaster_recovery": {
+    "backup_strategy": {
+      "database_backups": "Daily automated backups, 30-day retention",
+      "file_backups": "S3 cross-region replication",
+      "configuration_backups": "Infrastructure as code in Git",
+      "testing_schedule": "Monthly backup restoration tests"
+    },
+    "failover_procedures": {
+      "database_failover": "Automatic failover to standby instance",
+      "application_failover": "Load balancer health checks",
+      "dns_failover": "Route 53 health checks",
+      "recovery_time_objective": "RTO: 4 hours, RPO: 1 hour"
+    }
+  }
+} 

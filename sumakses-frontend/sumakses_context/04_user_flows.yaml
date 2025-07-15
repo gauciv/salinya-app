@@ -1,0 +1,672 @@
+app_name: SUMAKSES
+version: 1.0.0
+user_flows:
+  
+  # PRIMARY ONBOARDING FLOW
+  onboarding_flow:
+    name: "New User Onboarding"
+    priority: high
+    estimated_duration: "8-12 minutes"
+    steps:
+      - step_id: "landing_page"
+        name: "Landing Page"
+        description: "First impression and value proposition"
+        components:
+          - hero_section
+          - success_stories_carousel
+          - social_proof
+          - main_cta
+        user_actions:
+          - view_success_stories
+          - click_start_journey
+          - browse_testimonials
+        exit_points:
+          - back_button
+          - close_app
+        next_steps:
+          - success: "motivation_capture"
+          - abandonment: "exit_tracking"
+        
+      - step_id: "motivation_capture"
+        name: "Motivation Question"
+        description: "Single question to understand user's why"
+        components:
+          - question_display
+          - option_cards
+          - progress_indicator
+        user_actions:
+          - select_motivation
+          - go_back
+        validation:
+          - required: true
+          - single_selection: true
+        next_steps:
+          - success: "skills_scanner_choice"
+          - back: "landing_page"
+        
+      - step_id: "skills_scanner_choice"
+        name: "Skills Assessment Path"
+        description: "Choice between resume upload or interactive assessment"
+        components:
+          - path_comparison
+          - time_estimates
+          - preview_samples
+        user_actions:
+          - choose_resume_upload
+          - choose_interactive_assessment
+          - go_back
+        next_steps:
+          - resume_upload: "resume_processing"
+          - interactive_assessment: "assessment_questions"
+          - back: "motivation_capture"
+        
+      - step_id: "resume_processing"
+        name: "Resume Upload and Processing"
+        description: "AI extracts skills from uploaded resume"
+        components:
+          - file_upload_widget
+          - processing_animation
+          - extraction_preview
+        user_actions:
+          - upload_file
+          - confirm_extraction
+          - edit_extracted_skills
+        validation:
+          - file_size: "max_5MB"
+          - file_types: ["pdf", "docx", "txt"]
+        processing_time: "30_seconds"
+        next_steps:
+          - success: "compatibility_analysis"
+          - error: "fallback_to_assessment"
+        
+      - step_id: "assessment_questions"
+        name: "Interactive Assessment"
+        description: "15-question skills and experience evaluation"
+        components:
+          - question_presenter
+          - progress_bar
+          - answer_options
+        user_actions:
+          - answer_questions
+          - skip_question
+          - go_back
+        configuration:
+          - total_questions: 15
+          - estimated_time: "5_minutes"
+          - categories: ["experience", "skills", "preferences"]
+        next_steps:
+          - completion: "compatibility_analysis"
+          - timeout: "partial_assessment_save"
+        
+      - step_id: "compatibility_analysis"
+        name: "AI Analysis and Results"
+        description: "Process user data and generate compatibility scores"
+        components:
+          - processing_animation
+          - skills_translation_display
+          - compatibility_meter
+          - career_recommendations
+        user_actions:
+          - view_detailed_results
+          - explore_career_paths
+          - proceed_to_roadmap
+        data_processing:
+          - skill_extraction: "ai_powered"
+          - compatibility_scoring: "algorithm_based"
+          - career_matching: "weighted_factors"
+        next_steps:
+          - success: "roadmap_preview"
+          - low_compatibility: "alternative_suggestions"
+        
+      - step_id: "roadmap_preview"
+        name: "Personalized Roadmap Preview"
+        description: "Show sample learning path and timeline"
+        components:
+          - timeline_visualization
+          - milestone_preview
+          - time_commitment_calculator
+        user_actions:
+          - explore_timeline
+          - adjust_time_commitment
+          - proceed_to_registration
+        personalization:
+          - based_on_assessment: true
+          - time_commitment: "user_configurable"
+          - difficulty_level: "adaptive"
+        next_steps:
+          - interested: "registration_gate"
+          - not_interested: "feedback_collection"
+        
+      - step_id: "registration_gate"
+        name: "User Registration"
+        description: "Account creation to unlock full features"
+        components:
+          - value_proposition_reminder
+          - registration_form
+          - social_login_options
+        user_actions:
+          - fill_registration_form
+          - login_with_google
+          - login_with_facebook
+        required_fields:
+          - email
+          - password
+          - full_name
+          - phone_number
+        optional_fields:
+          - linkedin_profile
+          - current_company
+        next_steps:
+          - success: "email_verification"
+          - existing_user: "login_flow"
+        
+      - step_id: "email_verification"
+        name: "Email Verification"
+        description: "Confirm email address"
+        components:
+          - verification_message
+          - resend_option
+          - manual_verification
+        user_actions:
+          - click_email_link
+          - resend_verification
+          - enter_verification_code
+        next_steps:
+          - verified: "onboarding_complete"
+          - pending: "reminder_sequence"
+
+  # MAIN APP NAVIGATION FLOW
+  main_navigation_flow:
+    name: "Primary App Navigation"
+    priority: high
+    structure: "bottom_tab_navigation"
+    tabs:
+      - tab_id: "home"
+        name: "Home"
+        icon: "home"
+        default: true
+        components:
+          - progress_overview
+          - daily_recommendations
+          - quick_actions
+          - recent_activities
+        user_actions:
+          - view_progress
+          - start_daily_session
+          - access_chatbot
+          - view_notifications
+        
+      - tab_id: "learn"
+        name: "Learn"
+        icon: "book"
+        components:
+          - current_module
+          - learning_content
+          - progress_tracker
+          - next_actions
+        user_actions:
+          - consume_content
+          - mark_complete
+          - save_for_later
+          - ask_questions
+        
+      - tab_id: "chat"
+        name: "AI Tutor"
+        icon: "message"
+        components:
+          - chat_interface
+          - conversation_history
+          - quick_actions
+          - suggested_questions
+        user_actions:
+          - send_message
+          - view_history
+          - use_quick_actions
+          - rate_responses
+        
+      - tab_id: "community"
+        name: "Community"
+        icon: "users"
+        components:
+          - learning_circles
+          - mentorship_connections
+          - success_stories
+          - qa_forum
+        user_actions:
+          - join_discussions
+          - connect_with_mentors
+          - share_progress
+          - ask_questions
+        
+      - tab_id: "profile"
+        name: "Profile"
+        icon: "user"
+        components:
+          - user_profile
+          - progress_analytics
+          - achievements
+          - settings
+        user_actions:
+          - view_analytics
+          - update_profile
+          - adjust_settings
+          - export_portfolio
+
+  # LEARNING SESSION FLOW
+  learning_session_flow:
+    name: "Daily Learning Session"
+    priority: high
+    entry_points:
+      - home_dashboard
+      - push_notification
+      - scheduled_reminder
+    steps:
+      - step_id: "session_start"
+        name: "Session Initiation"
+        description: "Begin learning session with context"
+        components:
+          - session_overview
+          - time_commitment
+          - content_preview
+        user_actions:
+          - start_session
+          - adjust_time
+          - skip_today
+        next_steps:
+          - start: "content_consumption"
+          - skip: "skip_feedback"
+        
+      - step_id: "content_consumption"
+        name: "Learning Content"
+        description: "Engage with educational material"
+        content_types:
+          - video_lessons
+          - interactive_exercises
+          - reading_materials
+          - practice_projects
+        user_actions:
+          - watch_video
+          - complete_exercise
+          - read_article
+          - work_on_project
+        progress_tracking:
+          - time_spent: "tracked"
+          - completion_rate: "percentage"
+          - engagement_level: "monitored"
+        next_steps:
+          - completion: "knowledge_check"
+          - pause: "session_pause"
+        
+      - step_id: "knowledge_check"
+        name: "Understanding Verification"
+        description: "Quick assessment of learning"
+        components:
+          - quiz_questions
+          - practical_exercises
+          - reflection_prompts
+        user_actions:
+          - answer_questions
+          - submit_exercises
+          - provide_feedback
+        scoring:
+          - passing_score: "70_percent"
+          - retry_allowed: true
+          - adaptive_difficulty: true
+        next_steps:
+          - pass: "session_completion"
+          - fail: "review_content"
+        
+      - step_id: "session_completion"
+        name: "Session Wrap-up"
+        description: "Summary and next steps"
+        components:
+          - progress_summary
+          - achievement_unlocks
+          - next_session_preview
+        user_actions:
+          - view_progress
+          - share_achievement
+          - schedule_next_session
+        rewards:
+          - sakses_points: "earned"
+          - streak_tracking: "updated"
+          - badges: "potential_unlock"
+        next_steps:
+          - continue: "next_module"
+          - break: "home_dashboard"
+
+  # ASSESSMENT FLOW
+  assessment_flow:
+    name: "Skills Assessment Process"
+    priority: high
+    types:
+      - initial_assessment
+      - progress_assessment
+      - skill_validation
+    steps:
+      - step_id: "assessment_introduction"
+        name: "Assessment Overview"
+        description: "Explain assessment purpose and process"
+        components:
+          - purpose_explanation
+          - time_estimate
+          - privacy_notice
+        user_actions:
+          - begin_assessment
+          - learn_more
+          - skip_for_now
+        next_steps:
+          - begin: "assessment_execution"
+          - skip: "limited_access_mode"
+        
+      - step_id: "assessment_execution"
+        name: "Assessment Questions"
+        description: "Administer assessment questions"
+        components:
+          - question_presenter
+          - progress_indicator
+          - answer_options
+        configuration:
+          - adaptive_questioning: true
+          - time_limit: "no_limit"
+          - save_progress: true
+        user_actions:
+          - answer_questions
+          - skip_question
+          - pause_assessment
+        next_steps:
+          - completion: "assessment_processing"
+          - pause: "assessment_resume"
+        
+      - step_id: "assessment_processing"
+        name: "Results Processing"
+        description: "AI analyzes responses and generates insights"
+        components:
+          - processing_animation
+          - skill_analysis
+          - compatibility_calculation
+        processing_time: "30_seconds"
+        next_steps:
+          - success: "results_presentation"
+          - error: "manual_review"
+        
+      - step_id: "results_presentation"
+        name: "Assessment Results"
+        description: "Present personalized results and recommendations"
+        components:
+          - skills_visualization
+          - career_recommendations
+          - improvement_areas
+          - next_actions
+        user_actions:
+          - explore_results
+          - view_recommendations
+          - start_learning_path
+          - retake_assessment
+        sharing_options:
+          - save_to_profile: true
+          - share_with_mentors: true
+          - export_results: true
+        next_steps:
+          - accept_recommendations: "roadmap_generation"
+          - explore_more: "career_exploration"
+
+  # COMMUNITY ENGAGEMENT FLOW
+  community_flow:
+    name: "Community Interaction"
+    priority: mid
+    entry_points:
+      - community_tab
+      - notifications
+      - direct_links
+    flows:
+      mentorship_flow:
+        name: "Mentorship Connection"
+        steps:
+          - step_id: "mentor_discovery"
+            name: "Find Mentors"
+            description: "Browse available mentors"
+            components:
+              - mentor_profiles
+              - filter_options
+              - success_stories
+            user_actions:
+              - browse_mentors
+              - filter_by_criteria
+              - view_profiles
+            next_steps:
+              - interested: "mentor_request"
+              - not_found: "mentor_matching"
+          
+          - step_id: "mentor_request"
+            name: "Request Mentorship"
+            description: "Send mentorship request"
+            components:
+              - request_form
+              - introduction_message
+              - availability_selector
+            user_actions:
+              - send_request
+              - customize_message
+              - set_availability
+            next_steps:
+              - sent: "awaiting_response"
+              - matched: "mentorship_setup"
+          
+          - step_id: "mentorship_setup"
+            name: "Mentorship Initiation"
+            description: "Set up mentorship relationship"
+            components:
+              - goal_setting
+              - schedule_coordination
+              - communication_preferences
+            user_actions:
+              - set_goals
+              - coordinate_schedule
+              - set_preferences
+            next_steps:
+              - setup_complete: "ongoing_mentorship"
+      
+      learning_circles_flow:
+        name: "Learning Circles"
+        steps:
+          - step_id: "circle_discovery"
+            name: "Find Learning Circles"
+            description: "Discover relevant learning groups"
+            components:
+              - circle_listings
+              - compatibility_matching
+              - activity_previews
+            user_actions:
+              - browse_circles
+              - view_compatibility
+              - preview_activities
+            next_steps:
+              - interested: "circle_join_request"
+              - not_found: "circle_creation"
+          
+          - step_id: "circle_participation"
+            name: "Group Activities"
+            description: "Participate in learning circle"
+            components:
+              - group_challenges
+              - peer_reviews
+              - study_sessions
+            user_actions:
+              - join_challenges
+              - review_peers
+              - attend_sessions
+            next_steps:
+              - ongoing: "continuous_participation"
+              - graduation: "alumni_status"
+
+  # CAREER TRANSITION FLOW
+  career_transition_flow:
+    name: "Career Transition Process"
+    priority: high
+    phases:
+      preparation_phase:
+        name: "Job Preparation"
+        steps:
+          - step_id: "readiness_assessment"
+            name: "Job Readiness Check"
+            description: "Evaluate job application readiness"
+            components:
+              - skill_evaluation
+              - portfolio_review
+              - interview_preparation
+            user_actions:
+              - complete_evaluation
+              - update_portfolio
+              - practice_interviews
+            readiness_threshold: "80_percent"
+            next_steps:
+              - ready: "job_search_activation"
+              - not_ready: "continued_learning"
+          
+          - step_id: "portfolio_building"
+            name: "Portfolio Development"
+            description: "Create professional portfolio"
+            components:
+              - project_showcase
+              - skill_demonstration
+              - achievement_highlights
+            user_actions:
+              - upload_projects
+              - document_skills
+              - highlight_achievements
+            next_steps:
+              - complete: "portfolio_review"
+              - ongoing: "iterative_improvement"
+          
+          - step_id: "interview_preparation"
+            name: "Interview Readiness"
+            description: "Prepare for technical interviews"
+            components:
+              - mock_interviews
+              - question_practice
+              - scenario_preparation
+            user_actions:
+              - practice_interviews
+              - study_questions
+              - prepare_scenarios
+            next_steps:
+              - prepared: "job_application_phase"
+              - needs_work: "additional_preparation"
+      
+      application_phase:
+        name: "Job Application"
+        steps:
+          - step_id: "job_search"
+            name: "Job Opportunity Search"
+            description: "Find relevant job opportunities"
+            components:
+              - job_board_integration
+              - recommendation_engine
+              - application_tracking
+            user_actions:
+              - search_jobs
+              - save_opportunities
+              - track_applications
+            next_steps:
+              - found_opportunities: "application_submission"
+              - no_matches: "criteria_adjustment"
+          
+          - step_id: "application_support"
+            name: "Application Assistance"
+            description: "Support during application process"
+            components:
+              - resume_optimization
+              - cover_letter_assistance
+              - application_tracking
+            user_actions:
+              - optimize_resume
+              - write_cover_letter
+              - submit_applications
+            next_steps:
+              - submitted: "interview_preparation"
+              - rejected: "feedback_integration"
+          
+          - step_id: "interview_support"
+            name: "Interview Process Support"
+            description: "Guidance during interview process"
+            components:
+              - interview_coaching
+              - technical_preparation
+              - negotiation_guidance
+            user_actions:
+              - receive_coaching
+              - prepare_technically
+              - negotiate_offers
+            next_steps:
+              - success: "career_transition_complete"
+              - ongoing: "continued_support"
+
+  # ERROR HANDLING AND EDGE CASES
+  error_flows:
+    name: "Error Handling and Recovery"
+    scenarios:
+      - scenario_id: "network_failure"
+        name: "Network Connectivity Issues"
+        components:
+          - offline_mode_activation
+          - content_caching
+          - sync_on_reconnect
+        user_actions:
+          - continue_offline
+          - retry_connection
+          - save_progress
+        
+      - scenario_id: "assessment_timeout"
+        name: "Assessment Session Timeout"
+        components:
+          - progress_saving
+          - session_recovery
+          - restart_options
+        user_actions:
+          - resume_assessment
+          - restart_assessment
+          - save_and_exit
+        
+      - scenario_id: "content_loading_failure"
+        name: "Content Loading Issues"
+        components:
+          - alternative_content
+          - cached_content
+          - manual_refresh
+        user_actions:
+          - try_alternative
+          - use_cached_version
+          - refresh_content
+
+  # ANALYTICS AND TRACKING
+  analytics_tracking:
+    name: "User Journey Analytics"
+    tracked_events:
+      - user_registration
+      - assessment_completion
+      - learning_session_start
+      - learning_session_complete
+      - community_engagement
+      - career_milestone_reached
+      - job_application_submitted
+      - career_transition_success
+    
+    conversion_funnels:
+      - name: "Onboarding Conversion"
+        steps: ["landing_page", "motivation_capture", "assessment_completion", "registration"]
+        target_conversion: "40_percent"
+      
+      - name: "Learning Engagement"
+        steps: ["roadmap_view", "first_session", "week_1_completion", "month_1_completion"]
+        target_conversion: "70_percent"
+      
+      - name: "Career Transition"
+        steps: ["readiness_assessment", "job_search", "application_submission", "job_offer"]
+        target_conversion: "60_percent"
+    
+    success_metrics:
+      - user_retention: "70_percent_monthly"
+      - learning_completion: "80_percent_first_milestone"
+      - career_transition: "60_percent_within_6_months"
+      - user_satisfaction: "NPS_above_50" 

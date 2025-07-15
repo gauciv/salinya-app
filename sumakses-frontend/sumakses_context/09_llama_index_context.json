@@ -1,0 +1,535 @@
+{
+  "app_name": "SUMAKSES",
+  "version": "1.0.0",
+  "last_updated": "2024-12-19",
+  "llama_index_version": "0.9.x",
+  "rag_implementation": {
+    "overview": "RAG-powered chatbot for career guidance and learning assistance",
+    "primary_use_cases": [
+      "Career transition guidance",
+      "Learning path recommendations",
+      "Skill development questions",
+      "Tech industry insights",
+      "BPO-to-tech transition support",
+      "Community and mentorship guidance"
+    ],
+    "language_support": ["English", "Taglish", "basic_Filipino"],
+    "response_time_target": "< 3 seconds"
+  },
+  "knowledge_base_structure": {
+    "content_categories": {
+      "career_guides": {
+        "description": "Career transition guides and job market insights",
+        "file_types": ["pdf", "docx", "md", "txt"],
+        "estimated_size": "50MB",
+        "update_frequency": "weekly",
+        "sources": [
+          "Career transition success stories",
+          "Tech industry salary reports",
+          "Job market demand analysis",
+          "Skill requirement documentation",
+          "Interview preparation guides"
+        ]
+      },
+      "learning_resources": {
+        "description": "Learning materials and course recommendations",
+        "file_types": ["pdf", "json", "csv", "md"],
+        "estimated_size": "100MB",
+        "update_frequency": "daily",
+        "sources": [
+          "Course catalogs and descriptions",
+          "Learning path templates",
+          "Skill assessment criteria",
+          "Certification requirements",
+          "Educational resource links"
+        ]
+      },
+      "user_profiles": {
+        "description": "User assessment results and progress data",
+        "file_types": ["json"],
+        "estimated_size": "20MB",
+        "update_frequency": "real_time",
+        "sources": [
+          "User assessment results",
+          "Learning progress tracking",
+          "Skill development history",
+          "Career goal preferences",
+          "Personal learning styles"
+        ]
+      },
+      "community_content": {
+        "description": "Community discussions and Q&A",
+        "file_types": ["json", "txt"],
+        "estimated_size": "30MB",
+        "update_frequency": "real_time",
+        "sources": [
+          "Forum discussions",
+          "FAQ responses",
+          "Success story testimonials",
+          "Mentor advice and tips",
+          "Peer learning exchanges"
+        ]
+      },
+      "tech_industry_data": {
+        "description": "Technology industry trends and information",
+        "file_types": ["json", "csv", "pdf"],
+        "estimated_size": "40MB",
+        "update_frequency": "weekly",
+        "sources": [
+          "Technology trend reports",
+          "Company hiring data",
+          "Salary benchmarking",
+          "Skill demand analytics",
+          "Industry growth projections"
+        ]
+      },
+      "filipino_context": {
+        "description": "Filipino cultural and regional context",
+        "file_types": ["json", "txt", "md"],
+        "estimated_size": "15MB",
+        "update_frequency": "monthly",
+        "sources": [
+          "Filipino work culture insights",
+          "Local company information",
+          "Regional job market data",
+          "Cultural communication patterns",
+          "Success stories from Filipino professionals"
+        ]
+      }
+    },
+    "content_preparation": {
+      "document_preprocessing": {
+        "text_cleaning": [
+          "Remove headers and footers",
+          "Normalize whitespace",
+          "Fix encoding issues",
+          "Remove unnecessary formatting"
+        ],
+        "content_extraction": [
+          "Extract text from PDFs",
+          "Parse structured data from JSON/CSV",
+          "Extract metadata from documents",
+          "Identify document sections"
+        ],
+        "language_processing": [
+          "Detect language (English/Filipino)",
+          "Normalize Filipino text",
+          "Handle code-switching patterns",
+          "Preserve technical terminology"
+        ]
+      },
+      "chunking_strategy": {
+        "chunk_size": 1000,
+        "chunk_overlap": 200,
+        "chunking_method": "semantic_chunking",
+        "preserve_structure": true,
+        "metadata_inclusion": [
+          "document_title",
+          "section_headers",
+          "content_type",
+          "last_updated",
+          "relevance_score"
+        ]
+      }
+    }
+  },
+  "vector_database_configuration": {
+    "primary_choice": "Pinecone",
+    "alternative": "Weaviate",
+    "configuration": {
+      "dimension": 1536,
+      "metric": "cosine",
+      "pod_type": "p1.x1",
+      "replicas": 1,
+      "shards": 1
+    },
+    "index_structure": {
+      "indexes": {
+        "career_guidance": {
+          "description": "Career transition and job market information",
+          "namespace": "career_guides",
+          "estimated_vectors": 5000,
+          "metadata_fields": [
+            "career_path",
+            "experience_level",
+            "industry",
+            "location",
+            "last_updated"
+          ]
+        },
+        "learning_content": {
+          "description": "Learning resources and educational materials",
+          "namespace": "learning_resources",
+          "estimated_vectors": 10000,
+          "metadata_fields": [
+            "skill_category",
+            "difficulty_level",
+            "content_type",
+            "duration",
+            "provider"
+          ]
+        },
+        "user_context": {
+          "description": "User profiles and personalized data",
+          "namespace": "user_profiles",
+          "estimated_vectors": 2000,
+          "metadata_fields": [
+            "user_id",
+            "career_stage",
+            "target_role",
+            "skill_level",
+            "learning_style"
+          ]
+        },
+        "community_knowledge": {
+          "description": "Community discussions and shared knowledge",
+          "namespace": "community_content",
+          "estimated_vectors": 3000,
+          "metadata_fields": [
+            "topic_category",
+            "discussion_type",
+            "popularity_score",
+            "verified_answer",
+            "created_date"
+          ]
+        }
+      }
+    }
+  },
+  "embedding_configuration": {
+    "model": "text-embedding-ada-002",
+    "provider": "OpenAI",
+    "embedding_dimension": 1536,
+    "batch_size": 100,
+    "rate_limiting": {
+      "requests_per_minute": 3000,
+      "tokens_per_minute": 1000000
+    },
+    "cost_optimization": {
+      "caching_strategy": "Cache embeddings for frequently accessed content",
+      "batch_processing": "Process multiple documents in single API call",
+      "incremental_updates": "Only re-embed modified content"
+    }
+  },
+  "retrieval_configuration": {
+    "retrieval_strategy": "hybrid",
+    "components": {
+      "semantic_search": {
+        "similarity_threshold": 0.8,
+        "max_results": 5,
+        "reranking": true,
+        "boost_recent": true
+      },
+      "keyword_search": {
+        "enabled": true,
+        "weight": 0.3,
+        "fields": ["title", "key_terms", "tags"]
+      },
+      "metadata_filtering": {
+        "enabled": true,
+        "filters": [
+          "career_path",
+          "skill_level",
+          "content_type",
+          "language"
+        ]
+      }
+    },
+    "personalization": {
+      "user_profile_boost": 0.2,
+      "learning_history_boost": 0.1,
+      "preference_filtering": true,
+      "context_awareness": true
+    }
+  },
+  "query_processing": {
+    "query_understanding": {
+      "intent_classification": {
+        "intents": [
+          "career_guidance",
+          "learning_recommendations",
+          "skill_assessment",
+          "job_search_help",
+          "technical_questions",
+          "motivation_support",
+          "community_connection"
+        ],
+        "classification_model": "OpenAI GPT-4",
+        "confidence_threshold": 0.8
+      },
+      "entity_extraction": {
+        "entities": [
+          "career_roles",
+          "technical_skills",
+          "companies",
+          "locations",
+          "timeframes",
+          "experience_levels"
+        ],
+        "extraction_method": "NER + keyword matching"
+      },
+      "query_expansion": {
+        "synonyms": true,
+        "related_terms": true,
+        "filipino_translations": true,
+        "context_expansion": true
+      }
+    },
+    "context_management": {
+      "conversation_history": {
+        "max_turns": 10,
+        "context_window": 4000,
+        "importance_scoring": true,
+        "summarization": "auto"
+      },
+      "user_context": {
+        "current_learning_module": true,
+        "career_goals": true,
+        "assessment_results": true,
+        "progress_status": true
+      },
+      "session_context": {
+        "current_topic": true,
+        "discussion_flow": true,
+        "previous_recommendations": true,
+        "user_feedback": true
+      }
+    }
+  },
+  "response_generation": {
+    "llm_configuration": {
+      "model": "gpt-4",
+      "temperature": 0.7,
+      "max_tokens": 500,
+      "top_p": 0.9,
+      "frequency_penalty": 0.1,
+      "presence_penalty": 0.1
+    },
+    "response_templates": {
+      "career_guidance": {
+        "structure": "empathetic_opening + specific_advice + actionable_steps + encouragement",
+        "tone": "supportive and professional",
+        "examples": [
+          "I understand career transitions can feel overwhelming. Based on your BPO experience...",
+          "Your customer service skills are actually perfect for...",
+          "Here's what I recommend for your next steps..."
+        ]
+      },
+      "learning_recommendations": {
+        "structure": "skill_assessment + learning_path + resources + timeline",
+        "tone": "encouraging and practical",
+        "examples": [
+          "Based on your current skills, I recommend starting with...",
+          "This learning path will take approximately...",
+          "Here are the best resources for your learning style..."
+        ]
+      },
+      "motivation_support": {
+        "structure": "acknowledgment + perspective + success_stories + next_steps",
+        "tone": "empathetic and inspiring",
+        "examples": [
+          "It's normal to feel uncertain about career changes...",
+          "Many professionals like you have successfully transitioned...",
+          "Remember, your BPO experience gives you unique advantages..."
+        ]
+      }
+    },
+    "cultural_adaptation": {
+      "language_mixing": {
+        "taglish_support": true,
+        "code_switching": "natural",
+        "formality_level": "respectful but approachable"
+      },
+      "cultural_references": {
+        "filipino_examples": true,
+        "local_companies": true,
+        "cultural_values": "family-oriented, respect, community support"
+      },
+      "communication_style": {
+        "directness": "balanced - clear but not blunt",
+        "encouragement": "frequent positive reinforcement",
+        "respect": "acknowledge user's experience and journey"
+      }
+    }
+  },
+  "quality_assurance": {
+    "response_evaluation": {
+      "relevance_scoring": {
+        "semantic_relevance": 0.8,
+        "factual_accuracy": 0.9,
+        "cultural_appropriateness": 0.85,
+        "user_satisfaction": 0.8
+      },
+      "safety_checks": {
+        "content_filtering": true,
+        "bias_detection": true,
+        "harmful_content": true,
+        "privacy_protection": true
+      },
+      "quality_metrics": {
+        "response_time": "< 3 seconds",
+        "accuracy_rate": "> 90%",
+        "user_satisfaction": "> 4.5/5",
+        "fallback_rate": "< 5%"
+      }
+    },
+    "continuous_improvement": {
+      "feedback_collection": {
+        "user_ratings": true,
+        "correction_feedback": true,
+        "conversation_analysis": true,
+        "usage_patterns": true
+      },
+      "model_updates": {
+        "knowledge_base_updates": "weekly",
+        "response_template_tuning": "monthly",
+        "model_retraining": "quarterly",
+        "performance_monitoring": "real-time"
+      }
+    }
+  },
+  "technical_implementation": {
+    "llama_index_components": {
+      "document_loaders": [
+        "PDFReader",
+        "SimpleDirectoryReader",
+        "JSONReader",
+        "CSVReader",
+        "DatabaseReader"
+      ],
+      "text_splitters": [
+        "SentenceSplitter",
+        "TokenTextSplitter",
+        "SemanticSplitterNodeParser"
+      ],
+      "vector_stores": [
+        "PineconeVectorStore",
+        "WeaviateVectorStore"
+      ],
+      "retrievers": [
+        "VectorIndexRetriever",
+        "KeywordTableRetriever",
+        "KnowledgeGraphRetriever"
+      ],
+      "query_engines": [
+        "RetrieverQueryEngine",
+        "CitationQueryEngine",
+        "SubQuestionQueryEngine"
+      ],
+      "response_synthesizers": [
+        "ResponseSynthesizer",
+        "TreeSummarize",
+        "CompactAndRefine"
+      ]
+    },
+    "integration_patterns": {
+      "api_design": {
+        "endpoint": "/api/v1/chat",
+        "method": "POST",
+        "request_format": {
+          "message": "string",
+          "user_id": "string",
+          "context": "object",
+          "session_id": "string"
+        },
+        "response_format": {
+          "response": "string",
+          "sources": "array",
+          "confidence": "number",
+          "suggestions": "array"
+        }
+      },
+      "caching_strategy": {
+        "response_cache": "Redis with 1-hour TTL",
+        "embedding_cache": "Redis with 24-hour TTL",
+        "session_cache": "Redis with user session TTL",
+        "knowledge_cache": "In-memory with periodic refresh"
+      },
+      "error_handling": {
+        "llm_failures": "Fallback to predefined responses",
+        "vector_db_failures": "Fallback to keyword search",
+        "timeout_handling": "Graceful degradation",
+        "rate_limit_handling": "Queue and retry mechanism"
+      }
+    }
+  },
+  "deployment_configuration": {
+    "infrastructure": {
+      "compute": "AWS ECS with Fargate",
+      "memory": "4GB per container",
+      "cpu": "2 vCPU per container",
+      "scaling": "Auto-scaling based on request volume",
+      "availability": "Multi-AZ deployment"
+    },
+    "monitoring": {
+      "metrics": [
+        "Response time",
+        "Error rate",
+        "User satisfaction",
+        "Token usage",
+        "Vector database performance"
+      ],
+      "alerting": [
+        "High response time (> 5 seconds)",
+        "High error rate (> 5%)",
+        "Low user satisfaction (< 4.0/5)",
+        "API rate limit warnings",
+        "Vector database connection issues"
+      ],
+      "logging": [
+        "User queries and responses",
+        "Error logs with stack traces",
+        "Performance metrics",
+        "User feedback and ratings"
+      ]
+    }
+  },
+  "security_considerations": {
+    "data_protection": {
+      "user_data_encryption": "AES-256 encryption at rest",
+      "conversation_privacy": "User conversations isolated by session",
+      "pii_handling": "Automatic PII detection and masking",
+      "data_retention": "Conversation history limited to 30 days"
+    },
+    "access_control": {
+      "api_authentication": "JWT tokens with expiration",
+      "rate_limiting": "Per-user and per-IP rate limits",
+      "user_isolation": "User data access restricted to authorized sessions",
+      "admin_access": "Role-based access control for knowledge base updates"
+    }
+  },
+  "cost_optimization": {
+    "llm_usage": {
+      "prompt_optimization": "Minimize token usage through efficient prompts",
+      "response_caching": "Cache common responses to reduce API calls",
+      "batch_processing": "Process multiple queries in batches when possible",
+      "model_selection": "Use GPT-3.5-turbo for simpler queries"
+    },
+    "vector_database": {
+      "index_optimization": "Optimize vector dimensions and metadata",
+      "query_optimization": "Efficient similarity search parameters",
+      "storage_optimization": "Compress embeddings where possible",
+      "scaling_strategy": "Scale based on actual usage patterns"
+    }
+  },
+  "testing_strategy": {
+    "unit_tests": {
+      "embedding_generation": "Test embedding consistency",
+      "retrieval_accuracy": "Test retrieval relevance",
+      "response_generation": "Test response quality",
+      "error_handling": "Test graceful failure scenarios"
+    },
+    "integration_tests": {
+      "end_to_end_flow": "Test complete chat workflow",
+      "external_apis": "Test OpenAI and vector database integration",
+      "performance_tests": "Test response time under load",
+      "user_scenarios": "Test realistic user conversations"
+    },
+    "quality_assurance": {
+      "manual_testing": "Human evaluation of response quality",
+      "automated_evaluation": "Automated scoring of response relevance",
+      "user_acceptance": "Beta user testing and feedback collection",
+      "cultural_appropriateness": "Filipino cultural context validation"
+    }
+  }
+} 

@@ -1,0 +1,417 @@
+{
+  "app_name": "SUMAKSES",
+  "version": "1.0.0",
+  "last_updated": "2024-12-19",
+  "features": {
+    "high_priority": {
+      "smart_onboarding": {
+        "name": "Smart Onboarding Journey",
+        "priority": "high",
+        "implementation": "fully_functional",
+        "description": "Streamlined user entry with success stories, motivation capture, and skills assessment",
+        "components": {
+          "success_stories": {
+            "type": "video_carousel",
+            "duration": "30_seconds_each",
+            "count": 3,
+            "content": [
+              "BPO agent to web developer story",
+              "Customer service to QA tester story", 
+              "Team leader to product manager story"
+            ],
+            "features": ["autoplay", "swipe_navigation", "pause_resume"]
+          },
+          "motivation_capture": {
+            "type": "single_question",
+            "question": "What's driving your career change?",
+            "options": [
+              "Better salary opportunities",
+              "Remote work flexibility", 
+              "Career growth potential",
+              "Personal interest in technology"
+            ],
+            "ui_type": "card_selection"
+          },
+          "skills_scanner": {
+            "type": "choice_path",
+            "options": {
+              "resume_upload": {
+                "name": "Upload Resume",
+                "description": "AI extracts skills from your resume",
+                "file_types": ["pdf", "docx", "txt"],
+                "max_size": "5MB",
+                "processing_time": "30_seconds"
+              },
+              "interactive_assessment": {
+                "name": "5-Minute Assessment",
+                "description": "Answer questions about your experience",
+                "question_count": 15,
+                "estimated_time": "5_minutes",
+                "categories": ["experience", "skills", "preferences"]
+              }
+            }
+          },
+          "instant_preview": {
+            "type": "roadmap_preview",
+            "components": ["skills_translation", "timeline_view", "compatibility_score"],
+            "purpose": "Show value before registration"
+          }
+        },
+        "success_metrics": {
+          "completion_rate": "target_70_percent",
+          "time_to_complete": "max_10_minutes",
+          "conversion_to_registration": "target_40_percent"
+        }
+      },
+      "ai_assessment_engine": {
+        "name": "AI Skills Assessment Engine",
+        "priority": "high",
+        "implementation": "fully_functional",
+        "description": "Comprehensive skills evaluation with visual compatibility matching",
+        "components": {
+          "skills_extraction": {
+            "type": "ai_powered",
+            "methods": ["resume_parsing", "questionnaire_analysis"],
+            "skills_categories": [
+              "communication",
+              "problem_solving", 
+              "technical_aptitude",
+              "process_optimization",
+              "customer_service",
+              "documentation",
+              "training_mentoring"
+            ]
+          },
+          "compatibility_analysis": {
+            "type": "algorithm_based",
+            "factors": {
+              "skill_match": {"weight": 70, "description": "How well skills translate to tech roles"},
+              "market_demand": {"weight": 25, "description": "Job availability in target roles"},
+              "transition_history": {"weight": 5, "description": "Success rate of similar profiles"}
+            },
+            "output_format": "percentage_score"
+          },
+          "skills_translation": {
+            "type": "mapping_display",
+            "examples": [
+              {"bpo_skill": "Customer Service", "tech_skill": "User Experience Understanding"},
+              {"bpo_skill": "Process Documentation", "tech_skill": "Technical Documentation"},
+              {"bpo_skill": "Quality Assurance", "tech_skill": "Software Testing"},
+              {"bpo_skill": "Team Leadership", "tech_skill": "Product Management"},
+              {"bpo_skill": "Technical Support", "tech_skill": "DevOps Support"}
+            ]
+          },
+          "career_recommendations": {
+            "type": "ranked_list",
+            "count": 3,
+            "includes": ["job_title", "compatibility_score", "salary_range", "job_examples"],
+            "tech_roles": [
+              "Quality Assurance Tester",
+              "Technical Writer",
+              "Customer Success Manager",
+              "Product Manager",
+              "UX/UI Designer",
+              "Software Developer",
+              "Data Analyst",
+              "DevOps Engineer"
+            ]
+          }
+        },
+        "ai_requirements": {
+          "model_type": "GPT-4",
+          "processing_time": "max_30_seconds",
+          "accuracy_target": "85_percent",
+          "fallback_options": ["rule_based_assessment", "human_review"]
+        }
+      },
+      "personalized_roadmap": {
+        "name": "Personalized Roadmap Generator",
+        "priority": "high", 
+        "implementation": "fully_functional",
+        "description": "AI-generated learning paths with timeline and milestone tracking",
+        "components": {
+          "timeline_visualization": {
+            "type": "interactive_timeline",
+            "phases": [
+              {"name": "Foundation", "duration": "3_months", "description": "Basic concepts and orientation"},
+              {"name": "Skill Building", "duration": "6_months", "description": "Core technical skills development"},
+              {"name": "Job Preparation", "duration": "9_months", "description": "Portfolio building and interview prep"}
+            ],
+            "visual_style": "horizontal_timeline_with_checkpoints"
+          },
+          "micro_learning_structure": {
+            "session_duration": "15_30_minutes",
+            "daily_commitment": "configurable",
+            "content_types": ["video", "reading", "interactive", "practice"],
+            "offline_support": true
+          },
+          "milestone_tracking": {
+            "type": "checkpoint_system",
+            "components": ["skill_assessments", "project_submissions", "peer_reviews"],
+            "progress_visualization": "progress_bar_with_achievements"
+          },
+          "adaptive_learning": {
+            "type": "ai_powered",
+            "adjustments": ["pace", "difficulty", "content_type", "learning_style"],
+            "triggers": ["assessment_scores", "time_spent", "engagement_metrics"]
+          }
+        },
+        "content_integration": {
+          "internal_content": "30_percent",
+          "external_partnerships": "70_percent",
+          "sources": ["Coursera", "Udemy", "freeCodeCamp", "YouTube", "documentation"]
+        }
+      },
+      "core_chatbot": {
+        "name": "Core AI Chatbot",
+        "priority": "high",
+        "implementation": "fully_functional",
+        "description": "AI-powered conversational assistant using Llama Index RAG",
+        "components": {
+          "rag_implementation": {
+            "framework": "Llama Index",
+            "knowledge_base": [
+              "career_transition_guides",
+              "tech_industry_insights",
+              "learning_resources",
+              "user_progress_data",
+              "community_discussions"
+            ],
+            "update_frequency": "real_time"
+          },
+          "conversation_capabilities": {
+            "types": [
+              "roadmap_guidance",
+              "skill_clarification", 
+              "motivation_support",
+              "career_advice",
+              "learning_assistance"
+            ],
+            "context_awareness": "session_and_user_history",
+            "response_time": "max_3_seconds"
+          },
+          "filipino_context": {
+            "language_support": ["English", "Taglish", "basic_Tagalog"],
+            "cultural_understanding": "BPO_industry_knowledge",
+            "local_references": ["companies", "locations", "salary_ranges"]
+          }
+        },
+        "technical_specs": {
+          "model": "GPT-4_with_RAG",
+          "vector_database": "Pinecone_or_Weaviate",
+          "embedding_model": "text-embedding-ada-002",
+          "fallback_responses": "predefined_helpful_responses"
+        }
+      }
+    },
+    "mid_priority": {
+      "smart_support_system": {
+        "name": "Smart Support System",
+        "priority": "mid",
+        "implementation": "hardcoded_illustration",
+        "description": "Intelligent notifications and progress support",
+        "components": {
+          "adaptive_notifications": {
+            "type": "smart_scheduling",
+            "learns_user_patterns": true,
+            "notification_types": [
+              "learning_reminders",
+              "milestone_celebrations",
+              "job_market_updates",
+              "community_highlights"
+            ],
+            "frequency_control": "user_configurable"
+          },
+          "contextual_reminders": {
+            "triggers": ["time_based", "location_based", "activity_based"],
+            "examples": [
+              "15 minutes before lunch break",
+              "Morning commute learning suggestion",
+              "Weekend project reminder"
+            ]
+          },
+          "progress_celebrations": {
+            "type": "achievement_system",
+            "triggers": ["skill_completions", "streak_milestones", "assessment_improvements"],
+            "formats": ["visual_badges", "shareable_graphics", "personal_messages"]
+          }
+        }
+      },
+      "community_hub": {
+        "name": "Community Hub",
+        "priority": "mid",
+        "implementation": "hardcoded_illustration",
+        "description": "Social learning and mentorship platform",
+        "components": {
+          "mentorship_matching": {
+            "type": "algorithm_based",
+            "criteria": ["career_path", "experience_level", "location", "availability"],
+            "mentor_pool": "successful_alumni",
+            "matching_success_rate": "target_80_percent"
+          },
+          "learning_circles": {
+            "type": "small_groups",
+            "size": "5_8_members",
+            "formation": "similar_learning_paths",
+            "activities": ["group_challenges", "peer_reviews", "study_sessions"]
+          },
+          "success_stories": {
+            "type": "video_library",
+            "categories": ["career_paths", "company_types", "timeline", "salary_improvements"],
+            "search_functionality": "filterable_by_criteria",
+            "user_generated": true
+          },
+          "qa_forum": {
+            "type": "structured_discussion",
+            "categories": ["technical_questions", "career_advice", "learning_resources"],
+            "moderation": "ai_assisted_human_oversight",
+            "gamification": "reputation_system"
+          }
+        }
+      },
+      "progress_analytics": {
+        "name": "Progress Analytics Dashboard",
+        "priority": "mid",
+        "implementation": "hardcoded_illustration",
+        "description": "Comprehensive learning and skill development tracking",
+        "components": {
+          "skills_radar": {
+            "type": "spider_chart",
+            "dimensions": ["technical_skills", "soft_skills", "industry_knowledge", "practical_experience"],
+            "real_time_updates": true
+          },
+          "learning_analytics": {
+            "metrics": ["time_invested", "modules_completed", "assessment_scores", "project_submissions"],
+            "visualization": "multiple_chart_types",
+            "comparison": "peer_benchmarking"
+          },
+          "readiness_score": {
+            "type": "composite_metric",
+            "factors": ["skill_development", "portfolio_completion", "interview_preparation"],
+            "job_application_threshold": "80_percent"
+          }
+        }
+      },
+      "enhanced_user_profile": {
+        "name": "Enhanced User Profile",
+        "priority": "mid",
+        "implementation": "hardcoded_illustration", 
+        "description": "Comprehensive user profile with portfolio and achievements",
+        "components": {
+          "portfolio_showcase": {
+            "type": "project_gallery",
+            "supports": ["code_repos", "design_portfolios", "documentation_samples"],
+            "sharing_options": ["public_link", "pdf_export", "linkedin_integration"]
+          },
+          "achievement_tracking": {
+            "types": ["certifications", "completed_courses", "community_contributions"],
+            "verification": "blockchain_or_digital_certificates",
+            "display_options": ["timeline", "category", "importance"]
+          },
+          "career_timeline": {
+            "type": "visual_journey",
+            "milestones": ["BPO_experience", "learning_progress", "skill_achievements", "job_applications"],
+            "sharing_capability": "success_story_template"
+          }
+        }
+      }
+    },
+    "low_priority": {
+      "advanced_gamification": {
+        "name": "Advanced Gamification System",
+        "priority": "low",
+        "implementation": "pitch_only",
+        "description": "Comprehensive points, badges, and rewards system",
+        "components": {
+          "sakses_points": {
+            "earning_activities": ["learning_completion", "community_participation", "mentoring_others", "referrals"],
+            "exchange_rate": "1_point_per_minute_learned",
+            "leaderboards": ["weekly", "monthly", "all_time"]
+          },
+          "achievement_badges": {
+            "categories": ["learning_milestones", "community_contributions", "skill_mastery", "career_progress"],
+            "rarity_levels": ["bronze", "silver", "gold", "platinum"],
+            "social_sharing": "automatic_linkedin_posts"
+          },
+          "reward_marketplace": {
+            "offerings": ["course_discounts", "certification_vouchers", "job_interview_opportunities"],
+            "partner_rewards": ["free_subscriptions", "company_referrals", "mentorship_sessions"]
+          }
+        }
+      },
+      "partnership_ecosystem": {
+        "name": "Partnership Ecosystem",
+        "priority": "low",
+        "implementation": "pitch_only",
+        "description": "Corporate partnerships and job placement network",
+        "components": {
+          "company_sponsorships": {
+            "type": "branded_learning_tracks",
+            "benefits": ["direct_hiring_pipeline", "sponsored_internships", "company_challenges"],
+            "target_partners": ["tech_startups", "multinational_companies", "BPO_companies"]
+          },
+          "job_placement_network": {
+            "type": "hiring_partnerships",
+            "services": ["resume_forwarding", "interview_guarantees", "salary_negotiations"],
+            "success_fee_model": "percentage_of_first_year_salary"
+          }
+        }
+      },
+      "enterprise_features": {
+        "name": "Enterprise Features",
+        "priority": "low",
+        "implementation": "pitch_only",
+        "description": "B2B solutions for BPO companies",
+        "components": {
+          "bulk_assessments": {
+            "type": "company_wide_skills_analysis",
+            "reporting": ["department_level", "individual_level", "trend_analysis"],
+            "integration": "HRIS_systems"
+          },
+          "custom_learning_paths": {
+            "type": "company_specific_curricula",
+            "alignment": "internal_career_ladders",
+            "branding": "white_label_options"
+          }
+        }
+      }
+    }
+  },
+  "technical_requirements": {
+    "platform": "mobile_first",
+    "frameworks": {
+      "frontend": "React Native",
+      "backend": "Node.js with Express",
+      "database": "PostgreSQL with Redis caching",
+      "ai_integration": "OpenAI GPT-4 with Llama Index RAG"
+    },
+    "performance_targets": {
+      "app_load_time": "max_3_seconds",
+      "assessment_completion": "max_30_seconds",
+      "chatbot_response": "max_3_seconds",
+      "offline_capability": "core_learning_content"
+    },
+    "scalability": {
+      "initial_capacity": "10000_concurrent_users",
+      "growth_projection": "100000_users_by_year_1",
+      "architecture": "microservices_with_load_balancing"
+    }
+  },
+  "success_criteria": {
+    "user_engagement": {
+      "daily_active_users": "target_30_percent_of_registered",
+      "session_duration": "average_15_minutes",
+      "retention_rate": "70_percent_monthly"
+    },
+    "learning_outcomes": {
+      "assessment_completion": "70_percent_of_new_users",
+      "roadmap_engagement": "60_percent_start_learning_within_week",
+      "skill_progression": "80_percent_complete_first_milestone"
+    },
+    "career_impact": {
+      "job_placement_rate": "60_percent_within_6_months",
+      "salary_improvement": "average_150_percent_increase",
+      "user_satisfaction": "NPS_score_above_50"
+    }
+  }
+} 
