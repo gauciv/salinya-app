@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Upload, FileText, CheckCircle, X, AlertCircle, Brain } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 interface EnhancedResumeUploadProps {
   onComplete: (resumeData: any) => void
@@ -468,9 +476,107 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
         )}
       </div>
 
-      <p className="text-xs text-gray-500 text-center">
-        Your resume is analyzed securely using AWS AI services and never shared without permission
-      </p>
+      <div className="text-center space-y-2">
+        <p className="text-xs text-gray-500">
+          Resume are protected, view{" "}
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="link" className="text-xs text-blue-600 hover:text-blue-700 p-0 h-auto underline">
+                privacy policy
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold text-gray-900">Privacy Policy</DialogTitle>
+                <DialogDescription className="text-sm text-gray-600">
+                  Last updated: {new Date().toLocaleDateString()}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">1. Information We Collect</h3>
+                  <p className="mb-2">
+                    When you upload your resume, we collect and process the following information:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Resume content and file metadata</li>
+                    <li>Contact information provided during registration</li>
+                    <li>Usage data and interaction with our services</li>
+                    <li>Technical information about your device and browser</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">2. How We Use Your Information</h3>
+                  <p className="mb-2">We use the collected information to:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    <li>Analyze your resume using AI to provide career insights</li>
+                    <li>Generate personalized learning roadmaps and recommendations</li>
+                    <li>Improve our services and user experience</li>
+                    <li>Communicate with you about your account and services</li>
+                    <li>Ensure security and prevent fraud</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">3. Data Security</h3>
+                  <p>
+                    We implement industry-standard security measures to protect your information:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 mt-2">
+                    <li>Encryption of data in transit and at rest</li>
+                    <li>Secure cloud infrastructure using AWS services</li>
+                    <li>Regular security audits and updates</li>
+                    <li>Limited access to personal data by authorized personnel only</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">4. Data Sharing</h3>
+                  <p>
+                    We do not sell, trade, or rent your personal information to third parties. 
+                    We may share your information only in the following circumstances:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 mt-2">
+                    <li>With your explicit consent</li>
+                    <li>To comply with legal obligations</li>
+                    <li>To protect our rights and safety</li>
+                    <li>With service providers who assist in our operations (under strict confidentiality agreements)</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">5. Your Rights</h3>
+                  <p>You have the right to:</p>
+                  <ul className="list-disc pl-5 space-y-1 mt-2">
+                    <li>Access and review your personal information</li>
+                    <li>Request correction of inaccurate data</li>
+                    <li>Request deletion of your data</li>
+                    <li>Opt-out of marketing communications</li>
+                    <li>Export your data in a portable format</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">6. Data Retention</h3>
+                  <p>
+                    We retain your resume data for as long as your account is active or as needed 
+                    to provide our services. You may request deletion of your data at any time.
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="font-semibold text-gray-900 mb-2">7. Contact Us</h3>
+                  <p>
+                    If you have any questions about this Privacy Policy or our data practices, 
+                    please contact us at privacy@sumakses.com
+                  </p>
+                </section>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </p>
+      </div>
     </div>
   )
 }
