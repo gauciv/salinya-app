@@ -1,11 +1,10 @@
 ### SALINYA - Dinadala ka sa linya kung saan ka tugma
 
-A Next.js application helping Filipino BPO professionals transition to tech careers, now with AWS Cognito authentication.
+A Next.js application helping Filipino BPO professionals transition to tech careers
 
 ## Features
 
 - **Onboarding Flow**: Interactive assessment to match BPO skills with tech careers
-- **AWS Cognito Authentication**: Secure user registration and sign-in
 - **Resume Upload**: AI-powered skill extraction from resumes
 - **Career Matching**: Personalized tech career recommendations
 - **Learning Roadmaps**: Customized learning paths based on assessment results
@@ -16,7 +15,7 @@ A Next.js application helping Filipino BPO professionals transition to tech care
 
 - Node.js 18+ 
 - npm or yarn
-- AWS Account (for Cognito setup)
+- AWS Account
 
 ### Installation
 
@@ -43,27 +42,18 @@ A Next.js application helping Filipino BPO professionals transition to tech care
    NEXT_PUBLIC_AWS_REGION=us-east-1
    ```
 
-4. **Set up AWS Cognito**:
-   Follow the detailed guide in `COGNITO-SETUP.md`
-
-5. **Run the development server**:
+4. **Run the development server**:
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**:
+5. **Open your browser**:
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## Authentication Flow
 
-The application now uses AWS Cognito for secure authentication:
+**User Journey**: Landing → Assessment → Results → Registration → Resume Upload (Optional) → Main App
 
-1. **User Journey**: Landing → Assessment → Results → Cognito Registration → Resume Upload (Optional) → Main App
-2. **Cognito Features**: 
-   - Email-based registration
-   - Email verification
-   - Secure password requirements
-   - User attribute management
 
 ## Project Structure
 
@@ -71,7 +61,6 @@ The application now uses AWS Cognito for secure authentication:
 ├── app/                    # Next.js app directory
 ├── components/            # React components
 │   ├── ui/               # Reusable UI components
-│   ├── cognito-auth.tsx  # Cognito authentication
 │   ├── enhanced-resume-upload.tsx
 │   └── ...
 ├── lib/                  # Utility functions
@@ -83,7 +72,6 @@ The application now uses AWS Cognito for secure authentication:
 
 ## Key Components
 
-- **CognitoAuth**: Handles user registration, email verification, and sign-in
 - **EnhancedResumeUpload**: AI-powered resume processing with skill extraction
 - **EpicOnboardingFlow**: Interactive assessment and career matching
 - **MainApp**: Main application dashboard
@@ -111,14 +99,6 @@ npm run lint
 
 ## Configuration
 
-### AWS Cognito Setup
-
-See `COGNITO-SETUP.md` for detailed instructions on:
-- Creating a Cognito User Pool
-- Configuring authentication settings
-- Setting up email verification
-- Environment variable configuration
-
 ### Environment Variables
 
 Required environment variables:
@@ -145,7 +125,6 @@ The application can be deployed to any platform supporting Next.js:
 
 ## Security
 
-- User authentication handled by AWS Cognito
 - Secure password requirements enforced
 - Email verification required for account activation
 - Environment variables for sensitive configuration
@@ -166,7 +145,6 @@ This project is licensed under the MIT License.
 ## Support
 
 For setup issues:
-1. Check `COGNITO-SETUP.md` for AWS configuration
-2. Verify environment variables are correctly set
-3. Check browser console for error messages
-4. Review AWS CloudWatch logs for Cognito events
+1. Verify environment variables are correctly set
+2. Check browser console for error messages
+3. Review AWS CloudWatch logs for Cognito events
