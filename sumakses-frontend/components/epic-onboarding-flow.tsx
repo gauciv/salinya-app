@@ -607,6 +607,48 @@ function EpicAssessment({ type, onComplete, onDataChange }: { type: string; onCo
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState<any[]>([])
   const [showInsight, setShowInsight] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadComplete, setUploadComplete] = useState(false)
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    console.log('File selected:', file.name, file.size)
+    setIsUploading(true)
+    setUploadProgress(0)
+
+    try {
+      // Simulate upload progress
+      for (let i = 0; i <= 100; i += 10) {
+        setUploadProgress(i)
+        await new Promise(resolve => setTimeout(resolve, 200))
+      }
+
+      // Mock successful upload and analysis
+      setUploadComplete(true)
+      setIsUploading(false)
+      
+      // Simulate AI analysis results
+      const mockAnswers = [
+        { id: 1, value: 3, insight: "Your resume shows strong customer service experience!" },
+        { id: 2, value: "technical", insight: "Technical support background is perfect for QA roles!" },
+        { id: 3, value: 2, insight: "Good foundation for learning new technologies!" }
+      ]
+      
+      onDataChange(mockAnswers)
+      
+      // Auto-complete after successful upload
+      setTimeout(() => {
+        onComplete(mockAnswers)
+      }, 2000)
+      
+    } catch (error) {
+      console.error('Upload failed:', error)
+      setIsUploading(false)
+    }
+  }
 
   // Show resume upload GUI for resume_upload type
   if (type === "resume_upload") {
@@ -620,19 +662,53 @@ function EpicAssessment({ type, onComplete, onDataChange }: { type: string; onCo
 
         {/* Upload Area */}
         <div className="border-2 border-dashed border-gray-300 rounded-3xl p-8 text-center hover:border-blue-400 transition-colors">
-          <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Drop your resume here</h3>
-          <p className="text-gray-600 mb-4">or click to browse files</p>
-          <button 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-semibold transition-colors"
-            onClick={() => {
-              // TODO: Implement file upload
-              console.log('Choose file clicked')
-            }}
-          >
-            Choose File
-          </button>
-          <p className="text-sm text-gray-500 mt-3">PDF, DOC, DOCX • Max 5MB</p>
+          {!isUploading && !uploadComplete && (
+            <>
+              <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Drop your resume here</h3>
+              <p className="text-gray-600 mb-4">or click to browse files</p>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="resume-upload"
+              />
+              <label
+                htmlFor="resume-upload"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-semibold transition-colors cursor-pointer inline-block"
+              >
+                Choose File
+              </label>
+              <p className="text-sm text-gray-500 mt-3">PDF, DOC, DOCX • Max 5MB</p>
+            </>
+          )}
+          
+          {isUploading && (
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Analyzing your resume...</h3>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-600">{uploadProgress}% complete</p>
+            </div>
+          )}
+          
+          {uploadComplete && (
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-green-800">Analysis Complete!</h3>
+              <p className="text-sm text-green-700">We've identified your transferable skills and career matches.</p>
+            </div>
+          )}
         </div>
 
         {/* Privacy Notice */}
