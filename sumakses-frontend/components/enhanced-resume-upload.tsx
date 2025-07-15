@@ -72,52 +72,64 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
     event.preventDefault()
   }, [])
 
-  const simulateUploadAndExtraction = async () => {
+  const uploadToAPI = async () => {
+    if (!uploadState.file) return
+    
     updateState({ uploading: true, progress: 0, error: '' })
 
     try {
-      // Simulate upload progress
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise(resolve => setTimeout(resolve, 200))
-        updateState({ progress: i })
+      // Convert file to base64
+      const fileReader = new FileReader()
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        fileReader.onload = () => {
+          const result = fileReader.result as string
+          const base64 = result.split(',')[1] // Remove data:type;base64, prefix
+          resolve(base64)
+        }
+        fileReader.onerror = reject
+        fileReader.readAsDataURL(uploadState.file!)
+      })
+
+      updateState({ progress: 20 })
+      const base64Content = await base64Promise
+      
+      updateState({ progress: 40 })
+      
+      // Upload to API
+      const apiUrl = process.env.NEXT_PUBLIC_RESUME_API_URL
+      const response = await fetch(`${apiUrl}/upload-resume`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          file_content_base64: base64Content,
+          file_name: uploadState.file.name,
+          content_type: uploadState.file.type
+        })
+      })
+
+      updateState({ progress: 80 })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Upload failed')
       }
 
-      // Simulate AI extraction
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Mock extracted data
+      updateState({ progress: 100 })
+      
+      // Mock extracted data for demo
       const mockExtractedData = {
+        resumeId: result.resume_id,
+        status: result.status,
         skills: [
           { name: 'Customer Service', level: 90, category: 'Communication' },
           { name: 'Problem Solving', level: 85, category: 'Analytical' },
           { name: 'Team Leadership', level: 80, category: 'Management' },
           { name: 'Technical Support', level: 75, category: 'Technical' },
           { name: 'Process Improvement', level: 70, category: 'Operations' }
-        ],
-        experience: [
-          {
-            title: 'Customer Service Representative',
-            company: 'BPO Company',
-            duration: '2+ years',
-            responsibilities: [
-              'Handled customer inquiries and complaints',
-              'Maintained high customer satisfaction scores',
-              'Trained new team members'
-            ]
-          }
-        ],
-        education: [
-          {
-            degree: 'Bachelor\'s Degree',
-            field: 'Business Administration',
-            school: 'University'
-          }
-        ],
-        certifications: [
-          'Customer Service Excellence',
-          'Team Leadership'
-        ],
-        summary: 'Experienced customer service professional with strong communication and problem-solving skills, ready to transition into tech roles.'
+        ]
       }
 
       updateState({ 
@@ -128,7 +140,7 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
 
     } catch (error) {
       updateState({ 
-        error: 'Upload failed. Please try again.', 
+        error: error instanceof Error ? error.message : 'Upload failed. Please try again.', 
         uploading: false 
       })
     }
@@ -136,7 +148,7 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
 
   const handleUpload = () => {
     if (!uploadState.file) return
-    simulateUploadAndExtraction()
+    uploadToAPI()
   }
 
   const handleComplete = () => {
@@ -259,7 +271,7 @@ export default function EnhancedResumeUpload({ onComplete, onSkip, userEmail }: 
               {/* Upload Button */}
               {!uploadState.uploading && !uploadState.success && (
                 <Button
-                  onClick={handleUpload}
+                  onClick={uploadToAPI}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-11"
                 >
                   Process Resume with AI
