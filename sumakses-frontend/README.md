@@ -36,11 +36,15 @@ A Next.js application helping Filipino BPO professionals transition to tech care
    cp .env.local.example .env.local
    ```
    
-   Update `.env.local` with your AWS Cognito configuration:
+   Update `.env.local` with your configuration:
    ```env
+   # AWS Cognito
    NEXT_PUBLIC_COGNITO_USER_POOL_ID=your-user-pool-id
    NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID=your-client-id
    NEXT_PUBLIC_AWS_REGION=us-east-1
+   
+   # Resume Analyzer Backend
+   NEXT_PUBLIC_RESUME_API_URL=https://rks9izrci1.execute-api.ap-southeast-2.amazonaws.com/Prod
    ```
 
 4. **Set up AWS Cognito**:
@@ -123,9 +127,34 @@ See `COGNITO-SETUP.md` for detailed instructions on:
 
 Required environment variables:
 
+**AWS Cognito:**
 - `NEXT_PUBLIC_COGNITO_USER_POOL_ID`: Your Cognito User Pool ID
 - `NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID`: Your Cognito App Client ID  
 - `NEXT_PUBLIC_AWS_REGION`: AWS region (e.g., us-east-1)
+
+**Resume Analyzer Backend:**
+- `NEXT_PUBLIC_RESUME_API_URL`: Resume analyzer API endpoint
+- `NEXT_PUBLIC_RESUME_API_KEY`: API key (if required)
+
+### Still Need to Gather:
+
+1. **Test API Response Format**:
+   ```bash
+   curl -X POST https://rks9izrci1.execute-api.ap-southeast-2.amazonaws.com/Prod/upload-resume \
+     -F "file=@sample-resume.pdf"
+   ```
+
+2. **Check CORS Configuration**:
+   - AWS Console → API Gateway → Your API → Resources → Enable CORS
+   - Verify frontend domain is allowed
+
+3. **Verify API Key Requirement**:
+   - AWS Console → API Gateway → Your API → API Keys
+   - Add to `.env.local` if required
+
+4. **Check CloudWatch Logs**:
+   - AWS Console → CloudWatch → Log groups → Lambda function logs
+   - Note actual response structure for integration
 
 ## Deployment
 
